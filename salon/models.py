@@ -41,7 +41,7 @@ class Salon(models.Model):
 
 
 class Stylist(models.Model):
-    salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name='staylists')
+    salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name='stylists')
     name = models.CharField(max_length=100)
     name_en = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
@@ -66,11 +66,32 @@ class Stylist(models.Model):
 
 
 
+class Service(models.Model):
+    salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name='services')
+    name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.name} - {self.salon.name}'
 
 
 
+class StylistService(models.Model):
+    stylist = models.ForeignKey(Stylist, on_delete=models.CASCADE, related_name='services')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='services_stylists')
+    price = models.PositiveIntegerField()
+    duration_minutes = models.PositiveIntegerField()
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['stylist', 'service'],
+                name='unique_stylists_service',
+            )
+        ]
 
+    def __str__(self):
+        return f'{self.stylist.name} - {self.service.name} - {self.price}'
 
 
 

@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Salon, Stylist
+from .models import Salon, Stylist, StylistService, Service
+
+
+class StylistServiceInline(admin.TabularInline):
+    model = StylistService
+    extra = 1
 
 
 
@@ -16,3 +21,46 @@ class SalonAdmin(admin.ModelAdmin):
     search_fields = ('name', 'name_en', 'phone')
     readonly_fields = ('created_at', 'slug')
     inlines = [StylistInline,]
+
+
+
+
+@admin.register(Stylist)
+class StylistAdmin(admin.ModelAdmin):
+    list_display = ('name', 'salon', 'is_active', 'booking_window_days')
+    list_filter = ('salon', 'is_active')
+    search_fields = ('name', 'name_en', 'phone')
+    readonly_fields = ('created_at', 'slug')
+    inlines = [StylistServiceInline,]
+
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'salon', 'is_active')
+    list_filter = ('salon', 'is_active')
+    search_fields = ('name',)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
