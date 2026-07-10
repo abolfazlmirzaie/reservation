@@ -40,3 +40,25 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.customer_name} - {self.stylist_service.stylist.name} - {self.start_time.strftime('%Y-%m-%d %H:%M')}"
+
+
+
+class PlatformSettings(models.Model):
+    deposit_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=15.00)
+    deposit_minimum = models.PositiveIntegerField(default=5000)
+    deposit_maximum = models.PositiveIntegerField(default=20000)
+    platform_share_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=20.00)
+    
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    class Meta:
+        verbose_name = "تنظیمات پلتفرم"
+        verbose_name_plural = "تنظیمات پلتفرم"
+
+    def __str__(self):
+        return "تنظیمات پلتفرم"
