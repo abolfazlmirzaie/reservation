@@ -62,3 +62,77 @@ class PlatformSettings(models.Model):
 
     def __str__(self):
         return "تنظیمات پلتفرم"
+
+
+class Payment(models.Model):
+    STATUS_CHOICES = (
+    ('pending', 'در انتظار پرداخت'),
+    ('success', 'موفق'),
+    ('failed', 'ناموفق'),
+    ('returned', 'بازگشت داده شده'),
+    )
+
+    appointment = models.OneToOneField(Appointment, on_delete=models.PROTECT, related_name='payment')
+    amount = models.PositiveIntegerField()
+    gateway_ref_id = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='pending')
+    paid_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "پرداخت"
+        verbose_name_plural = "پرداخت‌ها"
+
+    def __str__(self):
+        return f"{self.appointment.customer_name} - {self.amount} - {self.status}"
+
+
+class SMSLog(models.Model):
+    TYPE_CHOICES = (
+        ('booking_confirmation', 'تایید رزرو'),
+        ('reminder', 'یادآوری'),
+        ('cancellation_by_salon', 'لغو توسط سالن'),
+        ('cancellation_by_customer', 'لغو توسط مشتری'),
+    )
+
+    STATUS_CHOICES = (
+        ('sent', 'ارسال شده'),
+        ('failed', 'ناموفق'),
+    )
+
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='sms_logs')
+    type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='sent')
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "پیامک"
+        verbose_name_plural = "پیامک‌ها"
+
+    def __str__(self):
+        return f"{self.appointment.customer_name} - {self.type} - {self.sent_at.strftime('%Y-%m-%d %H:%M')}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

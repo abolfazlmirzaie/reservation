@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Appointment, PlatformSettings
+from .models import Appointment, PlatformSettings, Payment, SMSLog
 
 
 @admin.register(Appointment)
@@ -16,3 +16,20 @@ class PlatformSettingsAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not PlatformSettings.objects.exists()
+
+
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('appointment', 'amount', 'status', 'paid_at')
+    list_filter = ('status',)
+    search_fields = ('appointment__customer_name', 'gateway_ref_id')
+    readonly_fields = ('created_at',)
+
+
+@admin.register(SMSLog)
+class SMSLogAdmin(admin.ModelAdmin):
+    list_display = ('appointment', 'type', 'status', 'sent_at')
+    list_filter = ('type', 'status')
+    search_fields = ('appointment__customer_name',)
+    readonly_fields = ('sent_at',)
