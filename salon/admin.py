@@ -1,13 +1,19 @@
 from django.contrib import admin
-from .models import Salon, Stylist, StylistService, Service
+from .models import Salon, Stylist, StylistService, Service, WorkingHours, DayOff
 
 
 class StylistServiceInline(admin.TabularInline):
     model = StylistService
     extra = 1
 
+class WorkingHoursInline(admin.TabularInline):
+    model = WorkingHours
+    extra = 0
 
 
+class DayOffInline(admin.TabularInline):
+    model = DayOff
+    extra = 1
 
 class StylistInline(admin.StackedInline):
     model = Stylist
@@ -31,7 +37,7 @@ class StylistAdmin(admin.ModelAdmin):
     list_filter = ('salon', 'is_active')
     search_fields = ('name', 'name_en', 'phone')
     readonly_fields = ('created_at', 'slug')
-    inlines = [StylistServiceInline,]
+    inlines = [StylistServiceInline, WorkingHoursInline, DayOffInline]
 
 
 
@@ -40,13 +46,6 @@ class ServiceAdmin(admin.ModelAdmin):
     list_display = ('name', 'salon', 'is_active')
     list_filter = ('salon', 'is_active')
     search_fields = ('name',)
-
-
-
-
-
-
-
 
 
 

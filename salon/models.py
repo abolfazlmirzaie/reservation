@@ -96,14 +96,52 @@ class StylistService(models.Model):
 
 
 
+class WorkingHours(models.Model):
+    DAY_CHOICES = (
+        (0, 'شنبه'),
+        (1, 'یکشنبه'),
+        (2, 'دوشنبه'),
+        (3, 'سه‌شنبه'),
+        (4, 'چهارشنبه'),
+        (5, 'پنج‌شنبه'),
+        (6, 'جمعه'),
+    )
+
+    stylist = models.ForeignKey(Stylist, on_delete=models.CASCADE, related_name='working_hours')
+    day_of_week = models.PositiveIntegerField(choices=DAY_CHOICES)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['stylist', 'day_of_week'],
+                name='unique_stylists_working_day',
+            )
+        ]
+        verbose_name = "ساعت کاری"
+        verbose_name_plural = "ساعات کاری"
 
 
+    def __str__(self):
+        return f"{self.stylist.name} - {self.get_day_of_week_display()}"
 
 
+class DayOff(models.Model):
+    stylist = models.ForeignKey(Stylist, on_delete=models.CASCADE, related_name='day_off')
+    date = models.DateField()
+    reason = models.CharField(max_length=100, blank=True, null=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['stylist', 'date'],
+                name='unique_stylists_day_off',
+            )
+        ]
 
-
-
-
+    def __str__(self):
+        return f"{self.stylist.name} - {self.date}"
 
 
