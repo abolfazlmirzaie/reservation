@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from salon.models import StylistService
-from .models import Appointment
 
 
 

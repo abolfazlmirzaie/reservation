@@ -1,15 +1,12 @@
-from rest_framework.generics import CreateAPIView
-
-from .models import Appointment
+from .exceptions import SlotUnavailableError
 from .serializers import AppointmentCreateSerializer
-from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
 from salon.models import StylistService
-from .services.booking_service import get_available_slots, calculate_deposit
-
+from .services.slot_service import get_available_slots
+from booking.services.appointment_service import AppointmentService
 
 
 class AvailableSlotsView(APIView):
@@ -56,26 +53,20 @@ class AppointmentCreateView(APIView):
         customer_name = serializer.validated_data['customer_name']
         customer_number = serializer.validated_data['customer_number']
 
-        available_slots = get_available_slots(stylist_service, target_date)
-        if target_time not in available_slots:
-            return Response(
-                {'error' : 'متاسفانه این ساعت همین الان رزرو شد. لطفاً ساعت دیگری انتخاب کنید'},
-                status=status.HTTP_409_CONFLICT
+        try:
+            appointment = AppointmentService.create(
+                stylist_service=stylist_service,
+                target_date=target_date,
+                target_time=target_time,
+                customer_name=customer_name,
+                customer_phone=customer_number,
             )
-        financials = calculate_deposit(stylist_service)
+        except SlotUnavailableError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_409_CONFLICT,
+            )
 
-        start_datetime = timezone.make_aware(datetime.combine(target_date, target_time))
-        end_datetime = start_datetime + timezone.timedelta(minutes=stylist_service.duration_minutes)
-
-        appointment = Appointment.objects.create(
-            stylist_service=stylist_service,
-            customer_name=customer_name,
-            customer_phone=customer_number,
-            start_time=start_datetime,
-            end_time=end_datetime,
-            status='pending_payment',
-            **financials
-        )
 
         return Response(
             {
@@ -85,27 +76,5 @@ class AppointmentCreateView(APIView):
             },
             status=status.HTTP_201_CREATED
         )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
-from sys import platform
-
 from django.utils import timezone
 from salon.models import WorkingHours, DayOff
-from booking.models import Appointment, PlatformSettings
-
+from booking.models import Appointment
+from django.db.models import Q
 
 def get_django_day_of_week(python_weekday):
 
@@ -46,7 +44,12 @@ def get_available_slots(stylist_service, target_date, step_minutes=30):
     booked_appointments = Appointment.objects.filter(
         stylist_service__stylist=stylist,
         start_time__date=target_date,
-        status__in=['pending_payment', 'confirmed']
+    ).filter(
+        Q(status='confirmed') |
+        Q(
+            status='pending_payment',
+            expires_at__gt=timezone.now()
+        )
     ).order_by('start_time')
 
     booked_ranges = [(timezone.localtime(appt.start_time), timezone.localtime(appt.end_time)) for appt in booked_appointments]
@@ -67,48 +70,3 @@ def get_available_slots(stylist_service, target_date, step_minutes=30):
             current += step
 
     return sorted(set(available_slots))
-
-
-
-
-
-
-
-
-
-def calculate_deposit(stylist_service):
-
-    settings = PlatformSettings.objects.first()
-    price = stylist_service.price
-
-    deposit = price * settings.deposit_percentage / 100
-    deposit = max(settings.deposit_minimum, min(deposit, settings.deposit_maximum))
-
-    platform_share = int(deposit * settings.platform_share_percentage / 100)
-    salon_share = int(deposit) - platform_share
-
-    return {
-        'service_price_snapshot': price,
-        'deposit_amount': int(deposit),
-        'platform_share': platform_share,
-        'salon_share': salon_share,
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

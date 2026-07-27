@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from salon.models import StylistService
 
 
@@ -30,7 +29,7 @@ class Appointment(models.Model):
     deposit_amount = models.PositiveIntegerField()
     platform_share = models.PositiveIntegerField()
     salon_share = models.PositiveIntegerField()
-
+    expires_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -78,6 +77,7 @@ class Payment(models.Model):
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='pending')
     paid_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         verbose_name = "پرداخت"
