@@ -1,12 +1,13 @@
-from .exceptions import SlotUnavailableError
-from .serializers import AppointmentCreateSerializer
+from .exceptions import SlotUnavailableError, PaymentStatusError, PaymentExpiresError
+from .serializers import AppointmentCreateSerializer, PaymentStartSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
 from salon.models import StylistService
 from .services.slot_service import get_available_slots
-from booking.services.appointment_service import AppointmentService
+from .services.appointment_service import AppointmentService
+from .services.payment_service import PaymentService
 
 
 class AvailableSlotsView(APIView):
@@ -77,4 +78,38 @@ class AppointmentCreateView(APIView):
             status=status.HTTP_201_CREATED
         )
 
+
+class PaymentStartView(APIView):
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = PaymentStartSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        appointment = serializer.validated_data['appointment']
+
+
+        try:
+            result = PaymentService.start_payment(
+                appointment=appointment,
+            )
+
+        except PaymentStatusError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        except PaymentExpiresError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {
+                "payment_url": result["payment_url"],
+                "payment_id": result["payment"].id,
+            },
+            status=status.HTTP_200_OK,
+        )
 
