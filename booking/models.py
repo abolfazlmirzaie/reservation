@@ -79,6 +79,17 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(blank=True, null=True)
 
+    authority = models.CharField(
+        max_length=100,
+        unique=True,
+        null=True,
+        blank=True,
+    )
+    card_pan = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True,
+    )
     class Meta:
         verbose_name = "پرداخت"
         verbose_name_plural = "پرداخت‌ها"

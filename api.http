@@ -18,3 +18,5 @@ Content-Type: application/json
 {
   "appointment": 6
 }
+###
+GET  127.0.0.1:8000/payment/callback/?Authority=123&Status=OK

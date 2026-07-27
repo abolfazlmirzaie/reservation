@@ -1,5 +1,6 @@
-from .exceptions import SlotUnavailableError, PaymentStatusError, PaymentExpiresError
-from .serializers import AppointmentCreateSerializer, PaymentStartSerializer
+from .exceptions import SlotUnavailableError, PaymentStatusError, PaymentExpiresError, PaymentNotFoundError, \
+    PaymentVerificationError
+from .serializers import AppointmentCreateSerializer, PaymentStartSerializer, PaymentCallbackSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -113,3 +114,38 @@ class PaymentStartView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
+class PaymentCallbackView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        serializer = PaymentCallbackSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        authority = serializer.validated_data['Authority']
+        payment_status = serializer.validated_data['Status']
+
+        try:
+            payment = PaymentService.verify_payment(
+                authority=authority,
+                status=payment_status,
+            )
+
+        except PaymentNotFoundError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        except PaymentVerificationError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {
+                "message": "پرداخت با موفقیت تایید شد.",
+                "payment_id": payment.id,
+            },
+            status=status.HTTP_200_OK,
+        )

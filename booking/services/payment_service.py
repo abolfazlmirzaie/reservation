@@ -1,4 +1,4 @@
-from booking.exceptions import PaymentExpiresError, PaymentStatusError
+from booking.exceptions import PaymentExpiresError, PaymentStatusError, PaymentNotFoundError, PaymentVerificationError
 from booking.models import Payment
 from django.db import transaction
 from django.utils import timezone
@@ -37,3 +37,51 @@ class PaymentService:
             'payment': payment,
             'payment_url': "https://example.com/payment"
         }
+
+
+    @staticmethod
+    @transaction.atomic
+    def verify_payment(* ,authority, status):
+
+        try:
+            payment = Payment.objects.select_related(
+                'appointment'
+            ).get(
+                authority=authority
+            )
+
+        except Payment.DoesNotExist:
+            raise PaymentNotFoundError(
+                'پرداخت موردنظر پیدا نشد.'
+            )
+
+        if status != "OK" :
+            payment.status = "failed"
+            payment.save(update_fields=['status'])
+            raise PaymentVerificationError(
+                'پرداخت توسط کاربر لغو شد.'
+            )
+        # TODO:
+        # Verify payment with ZarinPal
+
+        # payment.status = "success"
+        # payment.paid_at = timezone.now()
+        # payment.save(update_fields=['status',
+        #                             'paid_at'
+        #                ]
+        #              )
+        #
+        # appointment = payment.appointment
+        # appointment.status = "confirmed"
+        # appointment.save(update_fields=['status'])
+
+
+        return payment
+
+
+
+
+
+
+
+

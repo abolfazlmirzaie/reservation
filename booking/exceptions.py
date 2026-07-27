@@ -12,3 +12,10 @@ class PaymentStatusError(Exception):
 
 class PaymentExpiresError(Exception):
     pass
+
+class PaymentNotFoundError(Exception):
+    pass
+
+
+class PaymentVerificationError(Exception):
+    pass
