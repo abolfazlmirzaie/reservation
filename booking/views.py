@@ -1,6 +1,7 @@
 from .exceptions import SlotUnavailableError, PaymentStatusError, PaymentExpiresError, PaymentNotFoundError, \
     PaymentVerificationError
-from .serializers import AppointmentCreateSerializer, PaymentStartSerializer, PaymentCallbackSerializer
+from .serializers import AppointmentCreateSerializer, PaymentStartSerializer, PaymentCallbackSerializer, \
+    AvailableSlotsSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,8 +14,16 @@ from .services.payment_service import PaymentService
 
 class AvailableSlotsView(APIView):
     def get(self, request):
-        stylist_service_id = request.query_params.get('stylist_service')
-        date_str = request.query_params.get('date')
+        serializer = AvailableSlotsSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        stylist_service_id = serializer.validated_data['stylist_service']
+        date_str = serializer.validated_data['date']
+
+
+
+        # stylist_service_id = request.query_params.get('stylist_service')
+        # date_str = request.query_params.get('date')
 
         if not stylist_service_id or not date_str:
             return Response(

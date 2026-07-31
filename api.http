@@ -1,3 +1,13 @@
+# get available slots
+
+
+
+
+
+
+
+
+# create an appointment
 POST 127.0.0.1:8000/appointment/
 Content-Type: application/json
 
@@ -11,12 +21,15 @@ Content-Type: application/json
 }
 
 ###
-
+# statrt paying a appointment by send its id and get the payment url
 POST 127.0.0.1:8000/payment/start/
 Content-Type: application/json
 
 {
   "appointment": 6
 }
+
+
 ###
+# secend step of paying and get the gateway callback
 GET  127.0.0.1:8000/payment/callback/?Authority=123&Status=OK

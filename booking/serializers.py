@@ -4,6 +4,13 @@ from .models import Appointment
 
 
 
+class AvailableSlotsSerializer(serializers.Serializer):
+    stylist_service = serializers.IntegerField()
+    date = serializers.DateField()
+
+
+
+
 class AppointmentCreateSerializer(serializers.Serializer):
     stylist_service = serializers.PrimaryKeyRelatedField(queryset=StylistService.objects.all())
     date = serializers.DateField()

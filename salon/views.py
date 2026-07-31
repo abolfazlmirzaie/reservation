@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 from .models import Stylist
 from .serializers import StylistServiceSerializer, StylistPublicSerializer
 from rest_framework.generics import RetrieveAPIView
