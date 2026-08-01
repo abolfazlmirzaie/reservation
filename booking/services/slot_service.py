@@ -17,7 +17,10 @@ def get_django_day_of_week(python_weekday):
     }
     return mapping[python_weekday]
 
-
+BUSY_APPOINTMENT_STATUSES = [
+        "confirmed",
+        "completed",
+    ]
 def get_available_slots(stylist_service, target_date, step_minutes=30):
     stylist = stylist_service.stylist
     duration = timedelta(minutes=stylist_service.duration_minutes)
@@ -45,7 +48,7 @@ def get_available_slots(stylist_service, target_date, step_minutes=30):
         stylist_service__stylist=stylist,
         start_time__date=target_date,
     ).filter(
-        Q(status='confirmed') |
+        Q(status__in=BUSY_APPOINTMENT_STATUSES) |
         Q(
             status='pending_payment',
             expires_at__gt=timezone.now()
