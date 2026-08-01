@@ -4,7 +4,8 @@ from django.utils import timezone
 from booking.models import Appointment
 from booking.services.slot_service import get_available_slots
 from booking.services.deposit_service import calculate_deposit
-from booking.exceptions import SlotUnavailableError, InactiveResourceError, AppointmentNotFoundError
+from booking.exceptions import SlotUnavailableError, InactiveResourceError, AppointmentNotFoundError, \
+    UnAvailableStatusError
 
 
 class AppointmentService:
@@ -102,3 +103,27 @@ class AppointmentService:
                 'نوبت موردنظر پیدا نشد'
             )
         return appointment
+
+    @staticmethod
+    def update_appointment(*, appointment_id, status):
+
+        try:
+            appointment = Appointment.objects.get(id=appointment_id)
+        except Appointment.DoesNotExist:
+            raise AppointmentNotFoundError(
+                 'نوبت موردنظر پیدا نشد'
+            )
+
+        allowed_status = [
+            "cancelled_by_stylist",
+            "completed",
+            "no_show",
+        ]
+
+        if status not in allowed_status:
+            raise UnAvailableStatusError(
+                'وضعیت وارد شده معتبر نیست لطفا از این وضعیت ها استفاده کنید: completed, cancelled_by_stylist, no_show'
+            )
+
+        appointment.status = status
+        appointment.save(update_fields=["status"])

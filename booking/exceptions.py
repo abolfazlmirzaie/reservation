@@ -22,3 +22,6 @@ class PaymentVerificationError(Exception):
 
 class AppointmentNotFoundError(Exception):
     pass
+
+class UnAvailableStatusError(Exception):
+    pass

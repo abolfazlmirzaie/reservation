@@ -1,7 +1,7 @@
 from .exceptions import SlotUnavailableError, PaymentStatusError, PaymentExpiresError, PaymentNotFoundError, \
-    PaymentVerificationError, AppointmentNotFoundError
+    PaymentVerificationError, AppointmentNotFoundError, UnAvailableStatusError
 from .serializers import AppointmentCreateSerializer, PaymentStartSerializer, PaymentCallbackSerializer, \
-    AvailableSlotsSerializer, AppointmentDetailSerializer
+    AvailableSlotsSerializer, AppointmentDetailSerializer, UpdateAppointmentSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -177,6 +177,42 @@ class AppointmentDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+
         serializer = AppointmentDetailSerializer(appointment)
 
         return Response(serializer.data)
+
+
+
+
+class AppointmentUpdateView(APIView):
+
+    def patch(self, request, appointment_id, *args, **kwargs):
+
+        serializer = UpdateAppointmentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            AppointmentService.update_appointment(
+                appointment_id=appointment_id,
+                status=serializer.validated_data["status"],
+            )
+
+        except AppointmentNotFoundError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        except UnAvailableStatusError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {
+                "message": "وضعیت نوبت با موفقیت بروزرسانی شد."
+            },
+            status=status.HTTP_200_OK,
+        )

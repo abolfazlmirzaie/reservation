@@ -37,3 +37,18 @@ GET  127.0.0.1:8000/payment/callback/?Authority=123&Status=OK
 ###
 # get stylist appointments by sending date
 GET 127.0.0.1:8000/stylist/pari/appointments/?date=2026-08-01
+
+###
+# get an special appointment by id
+GET 127.0.0.1:8000/appointment/8/
+
+###
+
+# update an appointment status by id
+
+PATCH 127.0.0.1:8000/appointment/8/status/
+Content-Type: application/json
+
+{
+  "status": "no_show"
+}

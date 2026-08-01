@@ -63,3 +63,9 @@ class AppointmentDetailSerializer(serializers.ModelSerializer):
             'status',
             'created_at',
         ]
+
+
+class UpdateAppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['status']
