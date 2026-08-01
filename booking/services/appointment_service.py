@@ -70,3 +70,19 @@ class AppointmentService:
         )
 
         return appointment
+
+
+    @staticmethod
+    def get_stylist_appointments(*, stylist_slug, target_date):
+
+
+        appointments = Appointment.objects.select_related(
+            "stylist_service",
+            "stylist_service__service",
+            "stylist_service__stylist"
+        ).filter(
+            stylist_service__stylist__slug=stylist_slug,
+            start_time__date=target_date,
+        ).order_by("start_time")
+
+        return appointments
