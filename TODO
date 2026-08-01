@@ -1,0 +1,23 @@
+GET     /appointments/{id}/
+PATCH   /appointments/{id}/status/
+
+
+{
+    "id": 12,
+    "customer_name": "ابوالفضل",
+    "customer_phone": "09131234567",
+
+    "service": "رنگ مو",
+
+    "price": 150000,
+    "deposit": 20000,
+
+    "start_time": "2026-08-01 13:30",
+    "end_time": "2026-08-01 15:00",
+
+    "status": "confirmed",
+
+    "payment_status": "success",
+
+    "created_at": "2026-08-01 11:05"
+}

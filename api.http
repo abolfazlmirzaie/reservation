@@ -16,7 +16,7 @@ Content-Type: application/json
   "stylist_service": 2,
   "customer_name": "ابوالفضل میرزایی",
   "customer_number": "09123456789",
-  "date": "2026-07-28",
+  "date": "2026-08-1",
   "time": "14:00"
 }
 
@@ -33,3 +33,7 @@ Content-Type: application/json
 ###
 # secend step of paying and get the gateway callback
 GET  127.0.0.1:8000/payment/callback/?Authority=123&Status=OK
+
+###
+# get stylist appointments by sending date
+GET 127.0.0.1:8000/stylist/pari/appointments/?date=2026-08-01

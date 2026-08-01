@@ -4,8 +4,7 @@ from django.utils import timezone
 from booking.models import Appointment
 from booking.services.slot_service import get_available_slots
 from booking.services.deposit_service import calculate_deposit
-from booking.exceptions import SlotUnavailableError, InactiveResourceError
-
+from booking.exceptions import SlotUnavailableError, InactiveResourceError, AppointmentNotFoundError
 
 
 class AppointmentService:
@@ -86,3 +85,20 @@ class AppointmentService:
         ).order_by("start_time")
 
         return appointments
+
+
+    @staticmethod
+    def get_appointment(*, appointment_id):
+
+        try:
+            appointment = Appointment.objects.select_related(
+                "stylist_service",
+                "stylist_service__service",
+                "stylist_service__stylist",
+            ).get(id=appointment_id)
+
+        except Appointment.DoesNotExist:
+            raise AppointmentNotFoundError(
+                'نوبت موردنظر پیدا نشد'
+            )
+        return appointment

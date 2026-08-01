@@ -19,3 +19,6 @@ class PaymentNotFoundError(Exception):
 
 class PaymentVerificationError(Exception):
     pass
+
+class AppointmentNotFoundError(Exception):
+    pass

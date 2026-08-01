@@ -1,7 +1,7 @@
 from .exceptions import SlotUnavailableError, PaymentStatusError, PaymentExpiresError, PaymentNotFoundError, \
-    PaymentVerificationError
+    PaymentVerificationError, AppointmentNotFoundError
 from .serializers import AppointmentCreateSerializer, PaymentStartSerializer, PaymentCallbackSerializer, \
-    AvailableSlotsSerializer
+    AvailableSlotsSerializer, AppointmentDetailSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -158,3 +158,25 @@ class PaymentCallbackView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+
+
+
+class AppointmentDetailView(APIView):
+    def get(self, request, appointment_id, *args, **kwargs):
+
+        try:
+            appointment = AppointmentService.get_appointment(
+                appointment_id=appointment_id
+            )
+
+        except AppointmentNotFoundError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = AppointmentDetailSerializer(appointment)
+
+        return Response(serializer.data)

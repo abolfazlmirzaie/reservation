@@ -16,10 +16,10 @@ class StylistServiceSerializer(serializers.ModelSerializer):
 class StylistPublicSerializer(serializers.ModelSerializer):
     salon_name = serializers.CharField(source='salon.name')
     service = StylistServiceSerializer(source='services', many=True)
-
+    # working_hours = serializers.CharField(source='working_hours.day_of_week')
     class Meta:
         model = Stylist
-        fields = ['name', 'salon_name', 'service']
+        fields = ['name', 'salon_name', 'booking_window_days', 'service']
 
 
 class StylistAppointmentsQuerySerializer(serializers.Serializer):

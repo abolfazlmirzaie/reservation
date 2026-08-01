@@ -42,3 +42,24 @@ class PaymentCallbackSerializer(serializers.Serializer):
     Status = serializers.CharField(max_length=20)
 
 
+class AppointmentDetailSerializer(serializers.ModelSerializer):
+    service = serializers.CharField(source='stylist_service.service.name')
+    stylist = serializers.CharField(
+        source="stylist_service.stylist.name"
+    )
+
+    class Meta:
+        model = Appointment
+        fields = [
+            'id',
+            'customer_name',
+            'customer_phone',
+            'service',
+            'stylist',
+            'service_price_snapshot',
+            'deposit_amount',
+            'start_time',
+            'end_time',
+            'status',
+            'created_at',
+        ]
