@@ -51,7 +51,14 @@ class StylistAppointmentsSerializer(serializers.ModelSerializer):
 
 
 
+class DayOffSerializer(serializers.Serializer):
 
+    date = serializers.DateField(required=True)
+    reason = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=20,
+    )
 
 
 

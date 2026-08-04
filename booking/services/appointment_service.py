@@ -127,3 +127,17 @@ class AppointmentService:
 
         appointment.status = status
         appointment.save(update_fields=["status"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+

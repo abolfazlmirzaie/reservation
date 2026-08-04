@@ -52,3 +52,15 @@ Content-Type: application/json
 {
   "status": "no_show"
 }
+
+
+
+###
+POST 127.0.0.1:8000/stylist/pari/day-off/
+Content-Type: application/json
+
+{
+  "date": "2026-08-04",
+  "reason": "مسافرت"
+}
+
