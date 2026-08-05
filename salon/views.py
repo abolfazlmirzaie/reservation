@@ -1,18 +1,43 @@
+from django.db.models import Prefetch
 from rest_framework import status
 from rest_framework.response import Response
 from .services.day_off_service import DayOffService
-from .models import Stylist
+from .models import Stylist, StylistService, WorkingHours, DayOff
 from .serializers import StylistPublicSerializer, StylistAppointmentsQuerySerializer, StylistAppointmentsSerializer, \
-    DayOffSerializer
+    DayOffCreateSerializer
 from rest_framework.views import APIView
 from booking.services.appointment_service import AppointmentService
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
-
+from django.utils import timezone
 
 class StylistView(RetrieveAPIView):
     serializer_class = StylistPublicSerializer
-    queryset = Stylist.objects.filter(is_active=True)
     lookup_field = 'slug'
+
+    queryset = (
+        Stylist.objects
+        .filter(is_active=True)
+        .select_related("salon")
+        .prefetch_related(
+            Prefetch(
+                "services",
+                queryset=StylistService.objects.select_related("service")
+            ),
+            Prefetch(
+                "working_hours",
+                queryset=WorkingHours.objects.filter(
+                    is_active=True
+                ).order_by("day_of_week")
+            ),
+            Prefetch(
+                "day_offs",
+                queryset=DayOff.objects.filter(
+                    date__gte=timezone.localdate()
+                ).order_by("date")
+            )
+        )
+    )
+
 
 
 
@@ -37,7 +62,7 @@ class SetDayOffView(APIView):
 
     def post(self, request, slug, *args, **kwargs):
 
-        serializer = DayOffSerializer(data=request.data)
+        serializer = DayOffCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         stylist = get_object_or_404(Stylist, slug=slug)

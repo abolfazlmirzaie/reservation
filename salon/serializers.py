@@ -1,6 +1,36 @@
 from rest_framework import serializers
-from .models import Stylist, StylistService
+from .models import Stylist, StylistService, WorkingHours, DayOff
 from booking.models import Appointment
+
+
+class WorkingHoursSerializer(serializers.ModelSerializer):
+
+    day_name = serializers.CharField(
+        source='get_day_of_week_display',
+        read_only=True,
+    )
+
+    class Meta:
+        model = WorkingHours
+        fields = [
+            "day_of_week",
+            "day_name",
+            "start_time",
+            "end_time",
+        ]
+
+
+class DayOffSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DayOff
+        fields = [
+            "date",
+            "reason",
+        ]
+
+
+
 
 
 class StylistServiceSerializer(serializers.ModelSerializer):
@@ -14,12 +44,33 @@ class StylistServiceSerializer(serializers.ModelSerializer):
 
 
 class StylistPublicSerializer(serializers.ModelSerializer):
-    salon_name = serializers.CharField(source='salon.name')
-    service = StylistServiceSerializer(source='services', many=True)
-    # working_hours = serializers.CharField(source='working_hours.day_of_week')
+    salon_name = serializers.CharField(
+        source='salon.name'
+    )
+
+    services = StylistServiceSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    working_hours = WorkingHoursSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    day_offs = DayOffSerializer(
+        many=True,
+        read_only=True,
+    )
+
+
     class Meta:
         model = Stylist
-        fields = ['name', 'salon_name', 'booking_window_days', 'service']
+        fields = ['name', 'salon_name', 'booking_window_days', 'services', 'working_hours', 'day_offs']
+
+
+
+
 
 
 class StylistAppointmentsQuerySerializer(serializers.Serializer):
@@ -51,7 +102,7 @@ class StylistAppointmentsSerializer(serializers.ModelSerializer):
 
 
 
-class DayOffSerializer(serializers.Serializer):
+class DayOffCreateSerializer(serializers.Serializer):
 
     date = serializers.DateField(required=True)
     reason = serializers.CharField(

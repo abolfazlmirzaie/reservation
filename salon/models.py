@@ -129,7 +129,7 @@ class WorkingHours(models.Model):
 
 
 class DayOff(models.Model):
-    stylist = models.ForeignKey(Stylist, on_delete=models.CASCADE, related_name='day_off')
+    stylist = models.ForeignKey(Stylist, on_delete=models.CASCADE, related_name='day_offs')
     date = models.DateField()
     reason = models.CharField(max_length=100, blank=True, null=True)
 
