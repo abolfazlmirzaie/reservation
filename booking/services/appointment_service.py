@@ -44,7 +44,7 @@ class AppointmentService:
 
         if target_time not in available_slots:
             raise SlotUnavailableError(
-                "متاسفانه این ساعت همین الان رزرو شد. لطفاً ساعت دیگری انتخاب کنید."
+                "متاسفانه این ساعت قابل رزرو نیست. لطفاً ساعت دیگری انتخاب کنید."
             )
 
 
@@ -113,6 +113,7 @@ class AppointmentService:
             raise AppointmentNotFoundError(
                  'نوبت موردنظر پیدا نشد'
             )
+
 
         allowed_status = [
             "cancelled_by_stylist",

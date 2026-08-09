@@ -6,7 +6,7 @@ from .models import Appointment
 
 class AvailableSlotsSerializer(serializers.Serializer):
     stylist_service = serializers.IntegerField()
-    date = serializers.DateField()
+    date = serializers.CharField()
 
 
 

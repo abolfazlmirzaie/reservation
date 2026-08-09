@@ -1,4 +1,9 @@
+
 from django.db import transaction
+from django.utils import timezone
+
+from booking.exceptions import SlotUnavailableError
+from salon.exceptions import DateError
 from salon.models import DayOff
 from booking.models import Appointment
 
@@ -7,6 +12,12 @@ class DayOffService:
     @staticmethod
     @transaction.atomic
     def create_day_off(*, date, stylist, reason=""):
+
+
+        if date < timezone.localdate():
+            raise DateError(
+                "تاریخ وارد شده اشتباه است"
+            )
 
         day_off = DayOff.objects.create(
             date=date,

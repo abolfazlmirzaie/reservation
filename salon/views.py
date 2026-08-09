@@ -1,6 +1,8 @@
 from django.db.models import Prefetch
 from rest_framework import status
 from rest_framework.response import Response
+
+from .exceptions import DateError
 from .services.day_off_service import DayOffService
 from .models import Stylist, StylistService, WorkingHours, DayOff
 from .serializers import StylistPublicSerializer, StylistAppointmentsQuerySerializer, StylistAppointmentsSerializer, \
@@ -67,11 +69,18 @@ class SetDayOffView(APIView):
 
         stylist = get_object_or_404(Stylist, slug=slug)
 
-        day_off = DayOffService.create_day_off(
-            stylist=stylist,
-            date=serializer.validated_data['date'],
-            reason=serializer.validated_data['reason'],
-        )
+        try:
+            day_off = DayOffService.create_day_off(
+                stylist=stylist,
+                date=serializer.validated_data['date'],
+                reason=serializer.validated_data['reason'],
+            )
+        except DateError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
         return Response(
             {

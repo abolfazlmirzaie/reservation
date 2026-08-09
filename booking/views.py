@@ -22,8 +22,6 @@ class AvailableSlotsView(APIView):
 
 
 
-        # stylist_service_id = request.query_params.get('stylist_service')
-        # date_str = request.query_params.get('date')
 
         if not stylist_service_id or not date_str:
             return Response(

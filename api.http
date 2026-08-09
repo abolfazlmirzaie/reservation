@@ -1,12 +1,9 @@
 # get available slots
+GET 127.0.0.1:8000/slots/?stylist_service=2&date=2026-08-10
 
 
 
-
-
-
-
-
+###
 # create an appointment
 POST 127.0.0.1:8000/appointment/
 Content-Type: application/json
@@ -14,10 +11,10 @@ Content-Type: application/json
 
 {
   "stylist_service": 2,
-  "customer_name": "ابوالفضل میرزایی",
+  "customer_name": "ابوالفضل ",
   "customer_number": "09123456789",
-  "date": "2026-08-1",
-  "time": "14:00"
+  "date": "2026-08-10",
+  "time": "8:00"
 }
 
 ###
@@ -26,7 +23,7 @@ POST 127.0.0.1:8000/payment/start/
 Content-Type: application/json
 
 {
-  "appointment": 6
+  "appointment": 14
 }
 
 
@@ -36,11 +33,11 @@ GET  127.0.0.1:8000/payment/callback/?Authority=123&Status=OK
 
 ###
 # get stylist appointments by sending date
-GET 127.0.0.1:8000/stylist/pari/appointments/?date=2026-08-01
+GET 127.0.0.1:8000/stylist/pari/appointments/?date=2026-08-10
 
 ###
 # get an special appointment by id
-GET 127.0.0.1:8000/appointment/8/
+GET 127.0.0.1:8000/appointment/14/
 
 ###
 
@@ -50,7 +47,7 @@ PATCH 127.0.0.1:8000/appointment/8/status/
 Content-Type: application/json
 
 {
-  "status": "no_show"
+  "status": "no_shw"
 }
 
 
@@ -62,7 +59,7 @@ POST 127.0.0.1:8000/stylist/pari/day-off/
 Content-Type: application/json
 
 {
-  "date": "2026-08-04",
+  "date": "2026-08-10",
   "reason": "مسافرت"
 }
 
