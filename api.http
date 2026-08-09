@@ -62,4 +62,21 @@ Content-Type: application/json
   "date": "2026-08-10",
   "reason": "مسافرت"
 }
+###
 
+POST 127.0.0.1:8000/api/auth/request-otp/
+Content-Type: application/json
+
+{
+  "phone_number": "09131983517"
+}
+
+###
+
+POST 127.0.0.1:8000/api/auth/verify-otp/
+Content-Type: application/json
+
+{
+    "phone_number": "09131983517",
+    "code": "535534"
+}

@@ -11,6 +11,8 @@ from rest_framework.views import APIView
 from booking.services.appointment_service import AppointmentService
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
 from django.utils import timezone
+from accounts.permissions import CanManageAppointment, CanManageStylist
+
 
 class StylistView(RetrieveAPIView):
     serializer_class = StylistPublicSerializer
@@ -44,6 +46,8 @@ class StylistView(RetrieveAPIView):
 
 
 class StylistAppointmentsView(APIView):
+    permission_classes = [CanManageStylist]
+
     def get(self, request ,slug, *args, **kwargs):
 
         serializer = StylistAppointmentsQuerySerializer(data=request.query_params)
@@ -53,6 +57,15 @@ class StylistAppointmentsView(APIView):
             stylist_slug=slug,
             target_date=serializer.validated_data['date'],
         )
+        stylist = get_object_or_404(
+            Stylist,
+            slug=slug
+        )
+
+        self.check_object_permissions(
+            request,
+            stylist
+        )
 
         output_serializer = StylistAppointmentsSerializer(appointments, many=True)
 
@@ -60,7 +73,7 @@ class StylistAppointmentsView(APIView):
 
 
 class SetDayOffView(APIView):
-
+    permission_classes = [CanManageStylist]
 
     def post(self, request, slug, *args, **kwargs):
 
@@ -68,6 +81,11 @@ class SetDayOffView(APIView):
         serializer.is_valid(raise_exception=True)
 
         stylist = get_object_or_404(Stylist, slug=slug)
+
+        self.check_object_permissions(
+            request,
+            stylist
+        )
 
         try:
             day_off = DayOffService.create_day_off(

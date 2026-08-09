@@ -8,7 +8,7 @@ class SalonCategory(models.TextChoices):
 
 
 class Salon(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_salons')
     name = models.CharField(max_length=100, verbose_name="نام سالن به فارسی")
     name_en = models.CharField(max_length=100, verbose_name="نام سالن به انگلیسی")
     category = models.CharField(
@@ -41,6 +41,7 @@ class Salon(models.Model):
 
 
 class Stylist(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='stylist_profile', null=True, blank=True)
     salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name='stylists')
     name = models.CharField(max_length=100)
     name_en = models.CharField(max_length=100)
@@ -55,7 +56,7 @@ class Stylist(models.Model):
             base_slug = slugify(self.name_en)
             slug = base_slug
             counter = 1
-            while Salon.objects.filter(slug=slug).exists():
+            while Stylist.objects.filter(slug=slug).exists():
                 slug = f'{base_slug}-{counter}'
                 counter += 1
             self.slug = slug

@@ -6,7 +6,7 @@ class UserAdmin(BaseUserAdmin):
     BaseUserAdmin.fieldsets += (
         ("phone_info", {'fields': ('phone_number',)}),
     )
-    list_display = ('username', 'email', 'phone_number', 'is_staff')
+    list_display = ('email', 'phone_number', 'is_staff')
 
 
 

@@ -1,5 +1,8 @@
+from django.shortcuts import get_object_or_404
+
 from .exceptions import SlotUnavailableError, PaymentStatusError, PaymentExpiresError, PaymentNotFoundError, \
     PaymentVerificationError, AppointmentNotFoundError, UnAvailableStatusError
+from .models import Appointment
 from .serializers import AppointmentCreateSerializer, PaymentStartSerializer, PaymentCallbackSerializer, \
     AvailableSlotsSerializer, AppointmentDetailSerializer, UpdateAppointmentSerializer
 from rest_framework.views import APIView
@@ -10,7 +13,7 @@ from salon.models import StylistService
 from .services.slot_service import get_available_slots
 from .services.appointment_service import AppointmentService
 from .services.payment_service import PaymentService
-
+from accounts.permissions import IsCustomer, CanManageAppointment, CanManageStylist
 
 class AvailableSlotsView(APIView):
     def get(self, request):
@@ -52,6 +55,8 @@ class AvailableSlotsView(APIView):
 
 
 class AppointmentCreateView(APIView):
+    permission_classes = [IsCustomer]
+
     def post(self, request, *args, **kwargs):
         serializer = AppointmentCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -162,7 +167,9 @@ class PaymentCallbackView(APIView):
 
 
 class AppointmentDetailView(APIView):
+    permission_classes = [CanManageAppointment]
     def get(self, request, appointment_id, *args, **kwargs):
+
 
         try:
             appointment = AppointmentService.get_appointment(
@@ -176,6 +183,11 @@ class AppointmentDetailView(APIView):
             )
 
 
+        self.check_object_permissions(
+            request,
+            appointment
+        )
+
         serializer = AppointmentDetailSerializer(appointment)
 
         return Response(serializer.data)
@@ -184,17 +196,28 @@ class AppointmentDetailView(APIView):
 
 
 class AppointmentUpdateView(APIView):
+    permission_classes = [CanManageAppointment]
 
     def patch(self, request, appointment_id, *args, **kwargs):
 
         serializer = UpdateAppointmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+
+        self.check_object_permissions(
+            request,
+            appointment
+        )
+
         try:
             AppointmentService.update_appointment(
                 appointment_id=appointment_id,
                 status=serializer.validated_data["status"],
+
             )
+
+
 
         except AppointmentNotFoundError as e:
             return Response(
