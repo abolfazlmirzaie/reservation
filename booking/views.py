@@ -1,56 +1,68 @@
-from django.shortcuts import get_object_or_404
-
-from .exceptions import SlotUnavailableError, PaymentStatusError, PaymentExpiresError, PaymentNotFoundError, \
-    PaymentVerificationError, AppointmentNotFoundError, UnAvailableStatusError
-from .models import Appointment
-from .serializers import AppointmentCreateSerializer, PaymentStartSerializer, PaymentCallbackSerializer, \
-    AvailableSlotsSerializer, AppointmentDetailSerializer, UpdateAppointmentSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 from datetime import datetime
+
+from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from accounts.permissions import CanManageAppointment, CanManageStylist, IsCustomer
 from salon.models import StylistService
-from .services.slot_service import get_available_slots
+
+from .exceptions import (
+    AppointmentNotFoundError,
+    PaymentExpiresError,
+    PaymentNotFoundError,
+    PaymentStatusError,
+    PaymentVerificationError,
+    SlotUnavailableError,
+    UnAvailableStatusError,
+)
+from .models import Appointment
+from .serializers import (
+    AppointmentCreateSerializer,
+    AppointmentDetailSerializer,
+    AvailableSlotsSerializer,
+    PaymentCallbackSerializer,
+    PaymentStartSerializer,
+    UpdateAppointmentSerializer,
+)
 from .services.appointment_service import AppointmentService
 from .services.payment_service import PaymentService
-from accounts.permissions import IsCustomer, CanManageAppointment, CanManageStylist
+from .services.slot_service import get_available_slots
+
 
 class AvailableSlotsView(APIView):
     def get(self, request):
         serializer = AvailableSlotsSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        stylist_service_id = serializer.validated_data['stylist_service']
-        date_str = serializer.validated_data['date']
-
-
-
+        stylist_service_id = serializer.validated_data["stylist_service"]
+        date_str = serializer.validated_data["date"]
 
         if not stylist_service_id or not date_str:
             return Response(
-                {'error' : 'stylist_service_id and date are required'},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "stylist_service_id and date are required"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
             stylist_service = StylistService.objects.get(id=stylist_service_id)
         except StylistService.DoesNotExist:
             return Response(
-                {'error' : 'this service for this stylist does not exist'},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "this service for this stylist does not exist"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         try:
-            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
             return Response(
-                {'error' : 'invalid date format'},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "invalid date format"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         slots = get_available_slots(stylist_service, target_date)
-        slot_strings = [slot.strftime('%H:%M') for slot in slots]
+        slot_strings = [slot.strftime("%H:%M") for slot in slots]
         return Response(
-            {'available_slots': slot_strings},
+            {"available_slots": slot_strings},
         )
 
 
@@ -61,11 +73,11 @@ class AppointmentCreateView(APIView):
         serializer = AppointmentCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        stylist_service = serializer.validated_data['stylist_service']
-        target_date = serializer.validated_data['date']
-        target_time = serializer.validated_data['time']
-        customer_name = serializer.validated_data['customer_name']
-        customer_number = serializer.validated_data['customer_number']
+        stylist_service = serializer.validated_data["stylist_service"]
+        target_date = serializer.validated_data["date"]
+        target_time = serializer.validated_data["time"]
+        customer_name = serializer.validated_data["customer_name"]
+        customer_number = serializer.validated_data["customer_number"]
 
         try:
             appointment = AppointmentService.create(
@@ -81,25 +93,22 @@ class AppointmentCreateView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-
         return Response(
             {
-                'appointment_id': appointment.id,
-                'deposit_amount': appointment.deposit_amount,
-                'message' : 'نوبت شما ثبت شد. لطفاً برای تایید نهایی، بیعانه را پرداخت کنید'
+                "appointment_id": appointment.id,
+                "deposit_amount": appointment.deposit_amount,
+                "message": "نوبت شما ثبت شد. لطفاً برای تایید نهایی، بیعانه را پرداخت کنید",
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_201_CREATED,
         )
 
 
 class PaymentStartView(APIView):
-
     def post(self, request, *args, **kwargs):
 
         serializer = PaymentStartSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        appointment = serializer.validated_data['appointment']
-
+        appointment = serializer.validated_data["appointment"]
 
         try:
             result = PaymentService.start_payment(
@@ -128,13 +137,12 @@ class PaymentStartView(APIView):
 
 
 class PaymentCallbackView(APIView):
-
     def get(self, request, *args, **kwargs):
         serializer = PaymentCallbackSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        authority = serializer.validated_data['Authority']
-        payment_status = serializer.validated_data['Status']
+        authority = serializer.validated_data["Authority"]
+        payment_status = serializer.validated_data["Status"]
 
         try:
             payment = PaymentService.verify_payment(
@@ -163,13 +171,10 @@ class PaymentCallbackView(APIView):
         )
 
 
-
-
-
 class AppointmentDetailView(APIView):
     permission_classes = [CanManageAppointment]
-    def get(self, request, appointment_id, *args, **kwargs):
 
+    def get(self, request, appointment_id, *args, **kwargs):
 
         try:
             appointment = AppointmentService.get_appointment(
@@ -182,17 +187,11 @@ class AppointmentDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-
-        self.check_object_permissions(
-            request,
-            appointment
-        )
+        self.check_object_permissions(request, appointment)
 
         serializer = AppointmentDetailSerializer(appointment)
 
         return Response(serializer.data)
-
-
 
 
 class AppointmentUpdateView(APIView):
@@ -205,19 +204,13 @@ class AppointmentUpdateView(APIView):
 
         appointment = get_object_or_404(Appointment, id=appointment_id)
 
-        self.check_object_permissions(
-            request,
-            appointment
-        )
+        self.check_object_permissions(request, appointment)
 
         try:
             AppointmentService.update_appointment(
                 appointment_id=appointment_id,
                 status=serializer.validated_data["status"],
-
             )
-
-
 
         except AppointmentNotFoundError as e:
             return Response(
@@ -232,8 +225,6 @@ class AppointmentUpdateView(APIView):
             )
 
         return Response(
-            {
-                "message": "وضعیت نوبت با موفقیت بروزرسانی شد."
-            },
+            {"message": "وضعیت نوبت با موفقیت بروزرسانی شد."},
             status=status.HTTP_200_OK,
         )

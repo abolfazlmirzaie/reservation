@@ -1,12 +1,13 @@
 from rest_framework import serializers
-from .models import Stylist, StylistService, WorkingHours, DayOff
+
 from booking.models import Appointment
+
+from .models import DayOff, Stylist, StylistService, WorkingHours
 
 
 class WorkingHoursSerializer(serializers.ModelSerializer):
-
     day_name = serializers.CharField(
-        source='get_day_of_week_display',
+        source="get_day_of_week_display",
         read_only=True,
     )
 
@@ -21,7 +22,6 @@ class WorkingHoursSerializer(serializers.ModelSerializer):
 
 
 class DayOffSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = DayOff
         fields = [
@@ -30,23 +30,16 @@ class DayOffSerializer(serializers.ModelSerializer):
         ]
 
 
-
-
-
 class StylistServiceSerializer(serializers.ModelSerializer):
-    service_name = serializers.CharField(source='service.name')
+    service_name = serializers.CharField(source="service.name")
 
     class Meta:
         model = StylistService
-        fields = ['id', 'service_name', 'price', 'duration_minutes']
-
-
+        fields = ["id", "service_name", "price", "duration_minutes"]
 
 
 class StylistPublicSerializer(serializers.ModelSerializer):
-    salon_name = serializers.CharField(
-        source='salon.name'
-    )
+    salon_name = serializers.CharField(source="salon.name")
 
     services = StylistServiceSerializer(
         many=True,
@@ -63,27 +56,26 @@ class StylistPublicSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-
     class Meta:
         model = Stylist
-        fields = ['name', 'salon_name', 'booking_window_days', 'services', 'working_hours', 'day_offs']
-
-
-
-
+        fields = [
+            "name",
+            "salon_name",
+            "booking_window_days",
+            "services",
+            "working_hours",
+            "day_offs",
+        ]
 
 
 class StylistAppointmentsQuerySerializer(serializers.Serializer):
     date = serializers.DateField(required=True)
 
 
-
-
-
 class StylistAppointmentsSerializer(serializers.ModelSerializer):
-    service = serializers.CharField(source='stylist_service.service.name')
-    price = serializers.IntegerField(source='service_price_snapshot')
-    deposit = serializers.IntegerField(source='deposit_amount')
+    service = serializers.CharField(source="stylist_service.service.name")
+    price = serializers.IntegerField(source="service_price_snapshot")
+    deposit = serializers.IntegerField(source="deposit_amount")
 
     class Meta:
         model = Appointment
@@ -100,19 +92,10 @@ class StylistAppointmentsSerializer(serializers.ModelSerializer):
         ]
 
 
-
-
 class DayOffCreateSerializer(serializers.Serializer):
-
     date = serializers.DateField(required=True)
     reason = serializers.CharField(
         required=False,
         allow_blank=True,
         max_length=20,
     )
-
-
-
-
-
-

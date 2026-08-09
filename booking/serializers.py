@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from salon.models import StylistService
-from .models import Appointment
 
+from salon.models import StylistService
+
+from .models import Appointment
 
 
 class AvailableSlotsSerializer(serializers.Serializer):
@@ -9,32 +10,25 @@ class AvailableSlotsSerializer(serializers.Serializer):
     date = serializers.CharField()
 
 
-
-
 class AppointmentCreateSerializer(serializers.Serializer):
-    stylist_service = serializers.PrimaryKeyRelatedField(queryset=StylistService.objects.all())
+    stylist_service = serializers.PrimaryKeyRelatedField(
+        queryset=StylistService.objects.all()
+    )
     date = serializers.DateField()
     time = serializers.TimeField()
     customer_name = serializers.CharField(max_length=100)
     customer_number = serializers.CharField(max_length=11)
 
 
-
-
-
-
-
 class PaymentStartSerializer(serializers.Serializer):
     appointment = serializers.IntegerField()
 
-    def validate_appointment(self,value):
+    def validate_appointment(self, value):
         try:
             appointment = Appointment.objects.get(id=value)
         except Appointment.DoesNotExist:
             raise serializers.ValidationError("نوبت پیدا نشد.")
         return appointment
-
-
 
 
 class PaymentCallbackSerializer(serializers.Serializer):
@@ -43,29 +37,27 @@ class PaymentCallbackSerializer(serializers.Serializer):
 
 
 class AppointmentDetailSerializer(serializers.ModelSerializer):
-    service = serializers.CharField(source='stylist_service.service.name')
-    stylist = serializers.CharField(
-        source="stylist_service.stylist.name"
-    )
+    service = serializers.CharField(source="stylist_service.service.name")
+    stylist = serializers.CharField(source="stylist_service.stylist.name")
 
     class Meta:
         model = Appointment
         fields = [
-            'id',
-            'customer_name',
-            'customer_phone',
-            'service',
-            'stylist',
-            'service_price_snapshot',
-            'deposit_amount',
-            'start_time',
-            'end_time',
-            'status',
-            'created_at',
+            "id",
+            "customer_name",
+            "customer_phone",
+            "service",
+            "stylist",
+            "service_price_snapshot",
+            "deposit_amount",
+            "start_time",
+            "end_time",
+            "status",
+            "created_at",
         ]
 
 
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = ['status']
+        fields = ["status"]

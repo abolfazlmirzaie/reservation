@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 
-
 class RegisterOrLoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True)
 

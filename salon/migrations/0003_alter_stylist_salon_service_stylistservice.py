@@ -5,37 +5,81 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('salon', '0002_stylist'),
+        ("salon", "0002_stylist"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='stylist',
-            name='salon',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stylists', to='salon.salon'),
+            model_name="stylist",
+            name="salon",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="stylists",
+                to="salon.salon",
+            ),
         ),
         migrations.CreateModel(
-            name='Service',
+            name="Service",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('is_active', models.BooleanField(default=True)),
-                ('salon', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='services', to='salon.salon')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "salon",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="services",
+                        to="salon.salon",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='StylistService',
+            name="StylistService",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.PositiveIntegerField()),
-                ('duration_minutes', models.PositiveIntegerField()),
-                ('service', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='services_stylists', to='salon.service')),
-                ('stylist', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='services', to='salon.stylist')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("price", models.PositiveIntegerField()),
+                ("duration_minutes", models.PositiveIntegerField()),
+                (
+                    "service",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="services_stylists",
+                        to="salon.service",
+                    ),
+                ),
+                (
+                    "stylist",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="services",
+                        to="salon.stylist",
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('stylist', 'service'), name='unique_stylists_service')],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("stylist", "service"), name="unique_stylists_service"
+                    )
+                ],
             },
         ),
     ]

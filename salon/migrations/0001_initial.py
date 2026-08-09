@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,18 +14,49 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Salon',
+            name="Salon",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='نام سالن به فارسی')),
-                ('name_en', models.CharField(max_length=100, verbose_name='نام سالن به انگلیسی')),
-                ('category', models.CharField(choices=[('mens_salon', 'آرایشگاه مردانه'), ('womens_salon', 'آرایشگاه زنانه')], max_length=20)),
-                ('address', models.CharField(max_length=300)),
-                ('phone', models.CharField(max_length=10)),
-                ('slug', models.SlugField(blank=True, unique=True)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=100, verbose_name="نام سالن به فارسی"),
+                ),
+                (
+                    "name_en",
+                    models.CharField(
+                        max_length=100, verbose_name="نام سالن به انگلیسی"
+                    ),
+                ),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[
+                            ("mens_salon", "آرایشگاه مردانه"),
+                            ("womens_salon", "آرایشگاه زنانه"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("address", models.CharField(max_length=300)),
+                ("phone", models.CharField(max_length=10)),
+                ("slug", models.SlugField(blank=True, unique=True)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

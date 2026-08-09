@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class User(AbstractUser):
@@ -10,22 +10,14 @@ class User(AbstractUser):
         STYLIST = "stylist", "Stylist"
         SALON_OWNER = "salon_owner", "Salon Owner"
 
-
     username = models.CharField(max_length=11, unique=True, blank=True, null=True)
 
-    role = models.CharField(
-        max_length=20,
-        choices=Role.choices,
-        default=Role.CUSTOMER
-    )
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.CUSTOMER)
 
     REQUIRED_FIELDS = []
 
-
-
     def __str__(self):
         return self.phone_number or f"User {self.pk}"
-
 
 
 class OTPGenerator(models.Model):
@@ -36,4 +28,3 @@ class OTPGenerator(models.Model):
 
     def __str__(self):
         return self.phone_number
-

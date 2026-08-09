@@ -16,7 +16,7 @@ class OTPService:
             defaults={
                 "expires_at": expires_at,
                 "code": code,
-            }
+            },
         )
         return code
 

@@ -1,7 +1,6 @@
 from booking.models import PlatformSettings
 
 
-
 def calculate_deposit(stylist_service):
 
     settings = PlatformSettings.objects.first()
@@ -14,8 +13,8 @@ def calculate_deposit(stylist_service):
     salon_share = int(deposit) - platform_share
 
     return {
-        'service_price_snapshot': price,
-        'deposit_amount': int(deposit),
-        'platform_share': platform_share,
-        'salon_share': salon_share,
+        "service_price_snapshot": price,
+        "deposit_amount": int(deposit),
+        "platform_share": platform_share,
+        "salon_share": salon_share,
     }

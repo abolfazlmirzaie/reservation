@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('salon', '0004_dayoff_workinghours'),
+        ("salon", "0004_dayoff_workinghours"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='workinghours',
-            options={'verbose_name': 'ساعت کاری', 'verbose_name_plural': 'ساعات کاری'},
+            name="workinghours",
+            options={"verbose_name": "ساعت کاری", "verbose_name_plural": "ساعات کاری"},
         ),
     ]

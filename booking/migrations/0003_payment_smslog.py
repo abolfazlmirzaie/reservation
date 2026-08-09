@@ -5,40 +5,102 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('booking', '0002_platformsettings'),
+        ("booking", "0002_platformsettings"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.PositiveIntegerField()),
-                ('gateway_ref_id', models.CharField(blank=True, max_length=100, null=True)),
-                ('status', models.CharField(choices=[('pending', 'در انتظار پرداخت'), ('success', 'موفق'), ('failed', 'ناموفق'), ('returned', 'بازگشت داده شده')], default='pending', max_length=30)),
-                ('paid_at', models.DateTimeField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('appointment', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='payment', to='booking.appointment')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.PositiveIntegerField()),
+                (
+                    "gateway_ref_id",
+                    models.CharField(blank=True, max_length=100, null=True),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "در انتظار پرداخت"),
+                            ("success", "موفق"),
+                            ("failed", "ناموفق"),
+                            ("returned", "بازگشت داده شده"),
+                        ],
+                        default="pending",
+                        max_length=30,
+                    ),
+                ),
+                ("paid_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "appointment",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="payment",
+                        to="booking.appointment",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'پرداخت',
-                'verbose_name_plural': 'پرداخت\u200cها',
+                "verbose_name": "پرداخت",
+                "verbose_name_plural": "پرداخت\u200cها",
             },
         ),
         migrations.CreateModel(
-            name='SMSLog',
+            name="SMSLog",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(choices=[('booking_confirmation', 'تایید رزرو'), ('reminder', 'یادآوری'), ('cancellation_by_salon', 'لغو توسط سالن'), ('cancellation_by_customer', 'لغو توسط مشتری')], max_length=30)),
-                ('status', models.CharField(choices=[('sent', 'ارسال شده'), ('failed', 'ناموفق')], default='sent', max_length=10)),
-                ('sent_at', models.DateTimeField(auto_now_add=True)),
-                ('appointment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sms_logs', to='booking.appointment')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("booking_confirmation", "تایید رزرو"),
+                            ("reminder", "یادآوری"),
+                            ("cancellation_by_salon", "لغو توسط سالن"),
+                            ("cancellation_by_customer", "لغو توسط مشتری"),
+                        ],
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("sent", "ارسال شده"), ("failed", "ناموفق")],
+                        default="sent",
+                        max_length=10,
+                    ),
+                ),
+                ("sent_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "appointment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sms_logs",
+                        to="booking.appointment",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'پیامک',
-                'verbose_name_plural': 'پیامک\u200cها',
+                "verbose_name": "پیامک",
+                "verbose_name_plural": "پیامک\u200cها",
             },
         ),
     ]

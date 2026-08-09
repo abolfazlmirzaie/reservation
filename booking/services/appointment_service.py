@@ -1,42 +1,41 @@
 from datetime import datetime, timedelta
+
 from django.db import transaction
 from django.utils import timezone
+
+from booking.exceptions import (
+    AppointmentNotFoundError,
+    InactiveResourceError,
+    SlotUnavailableError,
+    UnAvailableStatusError,
+)
 from booking.models import Appointment
-from booking.services.slot_service import get_available_slots
 from booking.services.deposit_service import calculate_deposit
-from booking.exceptions import SlotUnavailableError, InactiveResourceError, AppointmentNotFoundError, \
-    UnAvailableStatusError
+from booking.services.slot_service import get_available_slots
 
 
 class AppointmentService:
-
     @staticmethod
     def validate(stylist_service):
 
         if not stylist_service.stylist.salon.is_active:
-            raise InactiveResourceError(
-                "این سالن در حال حاضر فعال نیست."
-            )
+            raise InactiveResourceError("این سالن در حال حاضر فعال نیست.")
 
         if not stylist_service.stylist.is_active:
-            raise InactiveResourceError(
-                "این آرایشگر در حال حاضر فعال نیست."
-            )
+            raise InactiveResourceError("این آرایشگر در حال حاضر فعال نیست.")
 
         if not stylist_service.service.is_active:
-            raise InactiveResourceError(
-                "این خدمت در حال حاضر فعال نیست."
-            )
+            raise InactiveResourceError("این خدمت در حال حاضر فعال نیست.")
 
     @staticmethod
     @transaction.atomic
     def create(
-            *,
-            stylist_service,
-            target_date,
-            target_time,
-            customer_name,
-            customer_phone,
+        *,
+        stylist_service,
+        target_date,
+        target_time,
+        customer_name,
+        customer_phone,
     ):
 
         AppointmentService.validate(stylist_service)
@@ -47,12 +46,9 @@ class AppointmentService:
                 "متاسفانه این ساعت قابل رزرو نیست. لطفاً ساعت دیگری انتخاب کنید."
             )
 
-
         deposit_data = calculate_deposit(stylist_service)
 
-        start_datetime = timezone.make_aware(
-            datetime.combine(target_date, target_time)
-        )
+        start_datetime = timezone.make_aware(datetime.combine(target_date, target_time))
 
         end_datetime = start_datetime + timedelta(
             minutes=stylist_service.duration_minutes
@@ -71,22 +67,23 @@ class AppointmentService:
 
         return appointment
 
-
     @staticmethod
     def get_stylist_appointments(*, stylist_slug, target_date):
 
-
-        appointments = Appointment.objects.select_related(
-            "stylist_service",
-            "stylist_service__service",
-            "stylist_service__stylist"
-        ).filter(
-            stylist_service__stylist__slug=stylist_slug,
-            start_time__date=target_date,
-        ).order_by("start_time")
+        appointments = (
+            Appointment.objects.select_related(
+                "stylist_service",
+                "stylist_service__service",
+                "stylist_service__stylist",
+            )
+            .filter(
+                stylist_service__stylist__slug=stylist_slug,
+                start_time__date=target_date,
+            )
+            .order_by("start_time")
+        )
 
         return appointments
-
 
     @staticmethod
     def get_appointment(*, appointment_id):
@@ -99,9 +96,7 @@ class AppointmentService:
             ).get(id=appointment_id)
 
         except Appointment.DoesNotExist:
-            raise AppointmentNotFoundError(
-                'نوبت موردنظر پیدا نشد'
-            )
+            raise AppointmentNotFoundError("نوبت موردنظر پیدا نشد")
         return appointment
 
     @staticmethod
@@ -110,10 +105,7 @@ class AppointmentService:
         try:
             appointment = Appointment.objects.get(id=appointment_id)
         except Appointment.DoesNotExist:
-            raise AppointmentNotFoundError(
-                 'نوبت موردنظر پیدا نشد'
-            )
-
+            raise AppointmentNotFoundError("نوبت موردنظر پیدا نشد")
 
         allowed_status = [
             "cancelled_by_stylist",
@@ -123,22 +115,8 @@ class AppointmentService:
 
         if status not in allowed_status:
             raise UnAvailableStatusError(
-                'وضعیت وارد شده معتبر نیست لطفا از این وضعیت ها استفاده کنید: completed, cancelled_by_stylist, no_show'
+                "وضعیت وارد شده معتبر نیست لطفا از این وضعیت ها استفاده کنید: completed, cancelled_by_stylist, no_show"
             )
 
         appointment.status = status
         appointment.save(update_fields=["status"])
-
-
-
-
-
-
-
-
-
-
-
-
-
-

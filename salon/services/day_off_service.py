@@ -1,11 +1,10 @@
-
 from django.db import transaction
 from django.utils import timezone
 
 from booking.exceptions import SlotUnavailableError
+from booking.models import Appointment
 from salon.exceptions import DateError
 from salon.models import DayOff
-from booking.models import Appointment
 
 
 class DayOffService:
@@ -13,11 +12,8 @@ class DayOffService:
     @transaction.atomic
     def create_day_off(*, date, stylist, reason=""):
 
-
         if date < timezone.localdate():
-            raise DateError(
-                "تاریخ وارد شده اشتباه است"
-            )
+            raise DateError("تاریخ وارد شده اشتباه است")
 
         day_off = DayOff.objects.create(
             date=date,
@@ -30,15 +26,12 @@ class DayOffService:
             "confirmed",
         ]
 
-
         appointment = Appointment.objects.filter(
             stylist_service__stylist=stylist,
             start_time__date=date,
             status__in=CANCELLABLE_APPOINTMENT_STATUSES,
         )
 
-        appointment.update(
-            status="cancelled_by_stylist"
-        )
+        appointment.update(status="cancelled_by_stylist")
 
         return day_off

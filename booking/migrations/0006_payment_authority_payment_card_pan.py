@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('booking', '0005_appointment_expires_at'),
+        ("booking", "0005_appointment_expires_at"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='payment',
-            name='authority',
+            model_name="payment",
+            name="authority",
             field=models.CharField(blank=True, max_length=100, null=True, unique=True),
         ),
         migrations.AddField(
-            model_name='payment',
-            name='card_pan',
+            model_name="payment",
+            name="card_pan",
             field=models.CharField(blank=True, max_length=30, null=True),
         ),
     ]

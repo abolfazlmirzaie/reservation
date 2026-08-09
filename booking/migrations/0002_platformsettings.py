@@ -4,24 +4,37 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('booking', '0001_initial'),
+        ("booking", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PlatformSettings',
+            name="PlatformSettings",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deposit_percentage', models.DecimalField(decimal_places=2, default=15.0, max_digits=5)),
-                ('deposit_minimum', models.PositiveIntegerField(default=5000)),
-                ('deposit_maximum', models.PositiveIntegerField(default=20000)),
-                ('platform_share_percentage', models.DecimalField(decimal_places=2, default=20.0, max_digits=5)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "deposit_percentage",
+                    models.DecimalField(decimal_places=2, default=15.0, max_digits=5),
+                ),
+                ("deposit_minimum", models.PositiveIntegerField(default=5000)),
+                ("deposit_maximum", models.PositiveIntegerField(default=20000)),
+                (
+                    "platform_share_percentage",
+                    models.DecimalField(decimal_places=2, default=20.0, max_digits=5),
+                ),
             ],
             options={
-                'verbose_name': 'تنظیمات پلتفرم',
-                'verbose_name_plural': 'تنظیمات پلتفرم',
+                "verbose_name": "تنظیمات پلتفرم",
+                "verbose_name_plural": "تنظیمات پلتفرم",
             },
         ),
     ]

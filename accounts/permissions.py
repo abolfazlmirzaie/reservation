@@ -1,8 +1,8 @@
-from rest_framework.permissions import BasePermission
 from django.contrib.auth import get_user_model
-
+from rest_framework.permissions import BasePermission
 
 User = get_user_model()
+
 
 class CanManageStylist(BasePermission):
     """
@@ -16,12 +16,9 @@ class CanManageStylist(BasePermission):
     message = "You do not have permission to manage this stylist."
 
     def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated
-            and request.user.role in (
-                User.Role.STYLIST,
-                User.Role.SALON_OWNER,
-            )
+        return request.user.is_authenticated and request.user.role in (
+            User.Role.STYLIST,
+            User.Role.SALON_OWNER,
         )
 
     def has_object_permission(self, request, view, stylist):
@@ -37,7 +34,6 @@ class CanManageStylist(BasePermission):
         return False
 
 
-
 class CanManageAppointment(BasePermission):
     """
     Stylist:
@@ -50,12 +46,9 @@ class CanManageAppointment(BasePermission):
     message = "You do not have permission to manage this appointment."
 
     def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated
-            and request.user.role in (
-                User.Role.STYLIST,
-                User.Role.SALON_OWNER,
-            )
+        return request.user.is_authenticated and request.user.role in (
+            User.Role.STYLIST,
+            User.Role.SALON_OWNER,
         )
 
     def has_object_permission(self, request, view, appointment):
@@ -73,18 +66,6 @@ class CanManageAppointment(BasePermission):
         return False
 
 
-
-
-
-
-
 class IsCustomer(BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated and request.user.role == "customer"
-        )
-
-
-
-
-
+        return request.user.is_authenticated and request.user.role == "customer"

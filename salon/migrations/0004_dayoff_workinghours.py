@@ -5,36 +5,87 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('salon', '0003_alter_stylist_salon_service_stylistservice'),
+        ("salon", "0003_alter_stylist_salon_service_stylistservice"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DayOff',
+            name="DayOff",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField()),
-                ('reason', models.CharField(blank=True, max_length=100, null=True)),
-                ('stylist', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='day_off', to='salon.stylist')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateField()),
+                ("reason", models.CharField(blank=True, max_length=100, null=True)),
+                (
+                    "stylist",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="day_off",
+                        to="salon.stylist",
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('stylist', 'date'), name='unique_stylists_day_off')],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("stylist", "date"), name="unique_stylists_day_off"
+                    )
+                ],
             },
         ),
         migrations.CreateModel(
-            name='WorkingHours',
+            name="WorkingHours",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('day_of_week', models.PositiveIntegerField(choices=[(0, 'شنبه'), (1, 'یکشنبه'), (2, 'دوشنبه'), (3, 'سه\u200cشنبه'), (4, 'چهارشنبه'), (5, 'پنج\u200cشنبه'), (6, 'جمعه')])),
-                ('start_time', models.TimeField()),
-                ('end_time', models.TimeField()),
-                ('is_active', models.BooleanField(default=True)),
-                ('stylist', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='working_hours', to='salon.stylist')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "day_of_week",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (0, "شنبه"),
+                            (1, "یکشنبه"),
+                            (2, "دوشنبه"),
+                            (3, "سه\u200cشنبه"),
+                            (4, "چهارشنبه"),
+                            (5, "پنج\u200cشنبه"),
+                            (6, "جمعه"),
+                        ]
+                    ),
+                ),
+                ("start_time", models.TimeField()),
+                ("end_time", models.TimeField()),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "stylist",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="working_hours",
+                        to="salon.stylist",
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('stylist', 'day_of_week'), name='unique_stylists_working_day')],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("stylist", "day_of_week"),
+                        name="unique_stylists_working_day",
+                    )
+                ],
             },
         ),
     ]
