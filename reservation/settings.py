@@ -40,11 +40,9 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "salon.apps.SalonConfig",
     "booking.apps.BookingConfig",
-
-
     "rest_framework",
-    'drf_spectacular',
-    'silk'
+    "drf_spectacular",
+    "silk",
 ]
 
 MIDDLEWARE = [
@@ -55,9 +53,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
-
-    "silk.middleware.SilkyMiddleware"
+    "silk.middleware.SilkyMiddleware",
 ]
 
 ROOT_URLCONF = "reservation.urls"
@@ -100,14 +96,11 @@ REST_FRAMEWORK = {
 }
 
 
-
-
 SPECTACULAR_SETTINGS = {
     "TITLE": "Reservation API",
     "DESCRIPTION": "API documentation for the reservation platform",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
-
     "SWAGGER_UI_SETTINGS": {
         "deepLinking": True,
         "persistAuthorization": True,

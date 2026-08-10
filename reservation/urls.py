@@ -27,33 +27,22 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-
     path(
         "api/schema/",
         SpectacularAPIView.as_view(),
         name="schema",
     ),
-
     path(
         "api/docs/",
-        SpectacularSwaggerView.as_view(
-            url_name="schema"
-        ),
+        SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-
     path(
         "api/redoc/",
-        SpectacularRedocView.as_view(
-            url_name="schema"
-        ),
+        SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-
-
     path("silk/", include("silk.urls", namespace="silk")),
-
-
     path("admin/", admin.site.urls),
     path("", include("salon.urls")),
     path("api/auth/", include("accounts.urls")),
