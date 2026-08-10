@@ -40,7 +40,10 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "salon.apps.SalonConfig",
     "booking.apps.BookingConfig",
+
+
     "rest_framework",
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -88,6 +91,23 @@ REST_FRAMEWORK = {
         "anon": "5/minutes",
         "user": "10/minutes",
         "login": "30/minutes",
+    },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Reservation API",
+    "DESCRIPTION": "API documentation for the reservation platform",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": True,
     },
 }
 
