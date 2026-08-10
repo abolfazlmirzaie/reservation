@@ -68,7 +68,7 @@ POST 127.0.0.1:8000/api/auth/request-otp/
 Content-Type: application/json
 
 {
-  "phone_number": "09131983517"
+  "phone_number": "11111111111"
 }
 
 ###
@@ -77,6 +77,6 @@ POST 127.0.0.1:8000/api/auth/verify-otp/
 Content-Type: application/json
 
 {
-    "phone_number": "09131983517",
-    "code": "535534"
+    "phone_number": "11111111111",
+    "code": "878027"
 }

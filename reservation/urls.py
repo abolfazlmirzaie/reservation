@@ -51,6 +51,8 @@ urlpatterns = [
     ),
 
 
+    path("silk/", include("silk.urls", namespace="silk")),
+
 
     path("admin/", admin.site.urls),
     path("", include("salon.urls")),
