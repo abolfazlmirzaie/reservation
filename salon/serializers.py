@@ -101,17 +101,40 @@ class DayOffCreateSerializer(serializers.Serializer):
     )
 
 
-
 class SalonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Salon
+        fields = ["id", "name", "category", "address", "phone", "slug"]
+
+
+class StylistShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stylist
+        fields = [
+            "id",
+            "name",
+            "name_en",
+            "slug",
+        ]
+
+
+class SalonDetailSerializer(serializers.ModelSerializer):
+    stylists = StylistShortSerializer(
+        many=True,
+        read_only=True,
+    )
+
+
+
 
     class Meta:
         model = Salon
-        fields = ['id', 'name', 'category', 'address', 'phone', 'slug']
-
-
-
-
-
-
-
-
+        fields = [
+            "id",
+            "name",
+            "category",
+            "address",
+            "phone",
+            "slug",
+            "stylists",
+        ]

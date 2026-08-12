@@ -15,11 +15,14 @@ from .serializers import (
     DayOffCreateSerializer,
     StylistAppointmentsQuerySerializer,
     StylistAppointmentsSerializer,
-    StylistPublicSerializer, SalonSerializer, SalonDetailSerializer,
+    StylistPublicSerializer,
+    SalonSerializer,
+    SalonDetailSerializer,
 )
 from .services.day_off_service import DayOffService
 
 from .paginations import SalonPageNumberPagination
+
 
 class StylistView(RetrieveAPIView):
     serializer_class = StylistPublicSerializer
@@ -102,8 +105,6 @@ class SetDayOffView(APIView):
         )
 
 
-
-
 class SalonListView(ListAPIView):
     pagination_class = SalonPageNumberPagination
     permission_classes = [AllowAny]
@@ -112,7 +113,17 @@ class SalonListView(ListAPIView):
     queryset = Salon.objects.all()
 
 
+class SalonDetailView(RetrieveAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = SalonDetailSerializer
+    lookup_field = "slug"
 
-
-
-
+    queryset = Salon.objects.filter(is_active=True).prefetch_related(
+        Prefetch(
+            "stylists",
+            queryset=(
+                Stylist.objects.filter(is_active=True)
+                .select_related("salon")
+            ),
+        )
+    )
