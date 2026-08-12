@@ -11,7 +11,7 @@ from .views import (
 
 urlpatterns = [
     path("slots/", AvailableSlotsView.as_view(), name="slots"),
-    path("appointment/", AppointmentCreateView.as_view(), name="appointment_create"),
+    path("appointment/create/", AppointmentCreateView.as_view(), name="appointment_create"),
     path(
         "appointment/<int:appointment_id>/",
         AppointmentDetailView.as_view(),

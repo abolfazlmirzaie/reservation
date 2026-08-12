@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -67,7 +68,7 @@ class AvailableSlotsView(APIView):
 
 
 class AppointmentCreateView(APIView):
-    permission_classes = [IsCustomer]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = AppointmentCreateSerializer(data=request.data)

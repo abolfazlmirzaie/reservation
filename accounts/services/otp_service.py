@@ -9,7 +9,7 @@ from accounts.models import OTPGenerator
 class OTPService:
     @staticmethod
     def generate_otp(phone_number):
-        code = str(random.randint(100000, 999999))
+        code = str(random.randint(10000, 99999))
         expires_at = timezone.now() + timedelta(minutes=10)
         OTPGenerator.objects.update_or_create(
             phone_number=phone_number,

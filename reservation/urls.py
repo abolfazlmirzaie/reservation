@@ -14,7 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import (
@@ -42,9 +42,15 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    path("silk/", include("silk.urls", namespace="silk")),
+
     path("admin/", admin.site.urls),
     path("", include("salon.urls")),
     path("api/auth/", include("accounts.urls")),
     path("", include("booking.urls")),
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += [
+        path('silk/', include('silk.urls', namespace='silk'))
+    ]
