@@ -1,7 +1,8 @@
 from django.db.models import Prefetch
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView, get_object_or_404
+from rest_framework.generics import RetrieveAPIView, get_object_or_404, ListAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,15 +10,16 @@ from accounts.permissions import CanManageAppointment, CanManageStylist
 from booking.services.appointment_service import AppointmentService
 
 from .exceptions import DateError
-from .models import DayOff, Stylist, StylistService, WorkingHours
+from .models import DayOff, Stylist, StylistService, WorkingHours, Salon, Service
 from .serializers import (
     DayOffCreateSerializer,
     StylistAppointmentsQuerySerializer,
     StylistAppointmentsSerializer,
-    StylistPublicSerializer,
+    StylistPublicSerializer, SalonSerializer, SalonDetailSerializer,
 )
 from .services.day_off_service import DayOffService
 
+from .paginations import SalonPageNumberPagination
 
 class StylistView(RetrieveAPIView):
     serializer_class = StylistPublicSerializer
@@ -98,3 +100,19 @@ class SetDayOffView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+
+
+class SalonListView(ListAPIView):
+    pagination_class = SalonPageNumberPagination
+    permission_classes = [AllowAny]
+
+    serializer_class = SalonSerializer
+    queryset = Salon.objects.all()
+
+
+
+
+
+

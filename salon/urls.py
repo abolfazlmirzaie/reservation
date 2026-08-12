@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import SetDayOffView, StylistAppointmentsView, StylistView
+from .views import SetDayOffView, StylistAppointmentsView, StylistView, SalonListView, SalonDetailView
 
 urlpatterns = [
     path("stylist/<slug:slug>/", StylistView.as_view(), name="stylist-detail"),
@@ -10,4 +10,6 @@ urlpatterns = [
         StylistAppointmentsView.as_view(),
         name="stylist-appointments",
     ),
+    path('salon/list/', SalonListView.as_view(), name='salon-list'),
+    
 ]

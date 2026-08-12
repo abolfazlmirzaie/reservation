@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from booking.models import Appointment
 
-from .models import DayOff, Stylist, StylistService, WorkingHours
+from .models import DayOff, Stylist, StylistService, WorkingHours, Salon
 
 
 class WorkingHoursSerializer(serializers.ModelSerializer):
@@ -99,3 +99,19 @@ class DayOffCreateSerializer(serializers.Serializer):
         allow_blank=True,
         max_length=20,
     )
+
+
+
+class SalonSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Salon
+        fields = ['id', 'name', 'category', 'address', 'phone', 'slug']
+
+
+
+
+
+
+
+
