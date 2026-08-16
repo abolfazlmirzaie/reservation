@@ -1,12 +1,9 @@
 from datetime import datetime
-
-from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.permissions import CanManageAppointment, CanManageStylist, IsCustomer
+from accounts.permissions import IsStylistOrSalonOwner, IsCustomer
 from salon.models import StylistService
 
 from .exceptions import (
@@ -68,7 +65,7 @@ class AvailableSlotsView(APIView):
 
 
 class AppointmentCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def post(self, request, *args, **kwargs):
         serializer = AppointmentCreateSerializer(data=request.data)
@@ -173,7 +170,7 @@ class PaymentCallbackView(APIView):
 
 
 class AppointmentDetailView(APIView):
-    permission_classes = [CanManageAppointment]
+    permission_classes = [IsStylistOrSalonOwner]
 
     def get(self, request, appointment_id, *args, **kwargs):
 
@@ -188,7 +185,6 @@ class AppointmentDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        self.check_object_permissions(request, appointment)
 
         serializer = AppointmentDetailSerializer(appointment)
 
@@ -196,16 +192,14 @@ class AppointmentDetailView(APIView):
 
 
 class AppointmentUpdateView(APIView):
-    permission_classes = [CanManageAppointment]
+    permission_classes = [IsStylistOrSalonOwner]
 
     def patch(self, request, appointment_id, *args, **kwargs):
 
         serializer = UpdateAppointmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        appointment = get_object_or_404(Appointment, id=appointment_id)
 
-        self.check_object_permissions(request, appointment)
 
         try:
             AppointmentService.update_appointment(

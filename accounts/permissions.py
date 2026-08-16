@@ -1,71 +1,40 @@
-from django.contrib.auth import get_user_model
-from rest_framework.permissions import BasePermission
+from functools import cache
 
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from rest_framework.permissions import BasePermission, IsAuthenticated
+from salon.models import Stylist
 User = get_user_model()
 
-
-class CanManageStylist(BasePermission):
-    """
-    Stylist:
-        فقط Stylist خودش
-
-    Salon Owner:
-        Stylistهای سالن خودش
-    """
-
-    message = "You do not have permission to manage this stylist."
+class IsStylistOrSalonOwner(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in (
-            User.Role.STYLIST,
-            User.Role.SALON_OWNER,
-        )
 
-    def has_object_permission(self, request, view, stylist):
+        if not request.user.is_authenticated:
+            return False
+        slug = view.kwargs['slug']
+        stylist = get_object_or_404(Stylist, slug=slug)
 
-        # Stylist فقط خودش
-        if request.user.role == User.Role.STYLIST:
-            return stylist.user == request.user
+        view.cached_stylist = stylist
 
-        # Salon Owner فقط Stylistهای سالن خودش
-        if request.user.role == User.Role.SALON_OWNER:
-            return stylist.salon.owner == request.user
-
-        return False
-
-
-class CanManageAppointment(BasePermission):
-    """
-    Stylist:
-        فقط Appointmentهای خودش
-
-    Salon Owner:
-        Appointmentهای Stylistهای سالن خودش
-    """
-
-    message = "You do not have permission to manage this appointment."
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in (
-            User.Role.STYLIST,
-            User.Role.SALON_OWNER,
-        )
-
-    def has_object_permission(self, request, view, appointment):
-
-        stylist = appointment.stylist_service.stylist
-
-        # Stylist فقط نوبت‌های خودش
-        if request.user.role == User.Role.STYLIST:
-            return stylist.user == request.user
-
-        # Salon Owner نوبت‌های Stylistهای سالن خودش
-        if request.user.role == User.Role.SALON_OWNER:
-            return stylist.salon.owner == request.user
-
+        if request.user.role in (User.Role.STYLIST, User.Role.SALON_OWNER):
+            if request.user.role == User.Role.STYLIST:
+                if stylist.user == request.user:
+                    return True
+            elif request.user.role == User.Role.SALON_OWNER:
+                if stylist.salon.owner == request.user:
+                    return True
         return False
 
 
 class IsCustomer(BasePermission):
+
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == "customer"
+
+        return request.user.is_authenticated and request.user.role == User.Role.CUSTOMER
+
+
+
+
+
+

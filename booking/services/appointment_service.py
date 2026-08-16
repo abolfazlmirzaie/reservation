@@ -68,7 +68,8 @@ class AppointmentService:
         return appointment
 
     @staticmethod
-    def get_stylist_appointments(*, stylist_slug, target_date):
+    def get_stylist_appointments(*, stylist_slug, target_date, user):
+    
 
         appointments = (
             Appointment.objects.select_related(

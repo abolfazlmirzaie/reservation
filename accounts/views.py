@@ -5,6 +5,7 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from salon.models import Stylist
 from .serializers import OTPVerifySerializer, RegisterOrLoginSerializer
 from .services.otp_service import OTPService
 from .throttles import LoginThrottle
@@ -52,12 +53,23 @@ class OTPVerifyView(APIView):
         if not is_valid:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
+
+
         user, created = User.objects.get_or_create(
             phone_number=phone_number,
-            defaults={
-                "role": User.Role.CUSTOMER,
-            },
         )
+
+        if created:
+            unlinked_stylist = Stylist.objects.filter(
+                phone=phone_number , user__isnull=True
+            ).first()
+
+            if unlinked_stylist:
+                user.role = User.Role.STYLIST
+                unlinked_stylist.user = user
+                unlinked_stylist.save(update_fields=["user"])
+                user.save(update_fields=["role"])
+
 
         OTPService.delete_otp(phone_number)
 

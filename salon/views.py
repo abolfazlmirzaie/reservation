@@ -1,16 +1,17 @@
 from django.db.models import Prefetch
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView, get_object_or_404, ListAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
-from accounts.permissions import CanManageAppointment, CanManageStylist
+from accounts.permissions import IsStylistOrSalonOwner
 from booking.services.appointment_service import AppointmentService
 
 from .exceptions import DateError
-from .models import DayOff, Stylist, StylistService, WorkingHours, Salon, Service
+from .models import DayOff, Stylist, StylistService, WorkingHours, Salon
 from .serializers import (
     DayOffCreateSerializer,
     StylistAppointmentsQuerySerializer,
@@ -52,7 +53,7 @@ class StylistView(RetrieveAPIView):
 
 
 class StylistAppointmentsView(APIView):
-    permission_classes = [CanManageStylist]
+    permission_classes = [IsStylistOrSalonOwner]
 
     def get(self, request, slug, *args, **kwargs):
 
@@ -63,9 +64,7 @@ class StylistAppointmentsView(APIView):
             stylist_slug=slug,
             target_date=serializer.validated_data["date"],
         )
-        stylist = get_object_or_404(Stylist, slug=slug)
 
-        self.check_object_permissions(request, stylist)
 
         output_serializer = StylistAppointmentsSerializer(appointments, many=True)
 
@@ -73,7 +72,8 @@ class StylistAppointmentsView(APIView):
 
 
 class SetDayOffView(APIView):
-    permission_classes = [CanManageStylist]
+    permission_classes = [IsStylistOrSalonOwner]
+
 
     def post(self, request, slug, *args, **kwargs):
 
@@ -81,8 +81,6 @@ class SetDayOffView(APIView):
         serializer.is_valid(raise_exception=True)
 
         stylist = get_object_or_404(Stylist, slug=slug)
-
-        self.check_object_permissions(request, stylist)
 
         try:
             day_off = DayOffService.create_day_off(
