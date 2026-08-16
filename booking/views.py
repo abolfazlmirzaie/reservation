@@ -15,7 +15,6 @@ from .exceptions import (
     SlotUnavailableError,
     UnAvailableStatusError,
 )
-from .models import Appointment
 from .serializers import (
     AppointmentCreateSerializer,
     AppointmentDetailSerializer,
