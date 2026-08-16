@@ -65,7 +65,6 @@ class StylistAppointmentsView(APIView):
             target_date=serializer.validated_data["date"],
         )
 
-
         output_serializer = StylistAppointmentsSerializer(appointments, many=True)
 
         return Response(output_serializer.data)
@@ -73,7 +72,6 @@ class StylistAppointmentsView(APIView):
 
 class SetDayOffView(APIView):
     permission_classes = [IsStylistOrSalonOwner]
-
 
     def post(self, request, slug, *args, **kwargs):
 
@@ -119,9 +117,6 @@ class SalonDetailView(RetrieveAPIView):
     queryset = Salon.objects.filter(is_active=True).prefetch_related(
         Prefetch(
             "stylists",
-            queryset=(
-                Stylist.objects.filter(is_active=True)
-                .select_related("salon")
-            ),
+            queryset=(Stylist.objects.filter(is_active=True).select_related("salon")),
         )
     )

@@ -53,15 +53,13 @@ class OTPVerifyView(APIView):
         if not is_valid:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
         user, created = User.objects.get_or_create(
             phone_number=phone_number,
         )
 
         if created:
             unlinked_stylist = Stylist.objects.filter(
-                phone=phone_number , user__isnull=True
+                phone=phone_number, user__isnull=True
             ).first()
 
             if unlinked_stylist:
@@ -69,7 +67,6 @@ class OTPVerifyView(APIView):
                 unlinked_stylist.user = user
                 unlinked_stylist.save(update_fields=["user"])
                 user.save(update_fields=["role"])
-
 
         OTPService.delete_otp(phone_number)
 

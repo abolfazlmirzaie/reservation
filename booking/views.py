@@ -185,7 +185,6 @@ class AppointmentDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-
         serializer = AppointmentDetailSerializer(appointment)
 
         return Response(serializer.data)
@@ -198,8 +197,6 @@ class AppointmentUpdateView(APIView):
 
         serializer = UpdateAppointmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-
 
         try:
             AppointmentService.update_appointment(

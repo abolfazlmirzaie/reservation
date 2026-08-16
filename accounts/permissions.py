@@ -4,15 +4,16 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from salon.models import Stylist
+
 User = get_user_model()
 
-class IsStylistOrSalonOwner(BasePermission):
 
+class IsStylistOrSalonOwner(BasePermission):
     def has_permission(self, request, view):
 
         if not request.user.is_authenticated:
             return False
-        slug = view.kwargs['slug']
+        slug = view.kwargs["slug"]
         stylist = get_object_or_404(Stylist, slug=slug)
 
         view.cached_stylist = stylist
@@ -28,13 +29,6 @@ class IsStylistOrSalonOwner(BasePermission):
 
 
 class IsCustomer(BasePermission):
-
     def has_permission(self, request, view):
 
         return request.user.is_authenticated and request.user.role == User.Role.CUSTOMER
-
-
-
-
-
-

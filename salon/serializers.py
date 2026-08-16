@@ -124,9 +124,6 @@ class SalonDetailSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-
-
-
     class Meta:
         model = Salon
         fields = [

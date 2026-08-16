@@ -10,8 +10,6 @@ User = get_user_model()
 
 
 class RegisterOrLoginViewTests(APITestCase):
-
-
     def setUp(self):
         self.url = reverse("request-otp")
 
@@ -32,9 +30,6 @@ class RegisterOrLoginViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("phone_number", response.data)
         mock_generate_otp.assert_not_called()
-
-
-
 
     @patch("accounts.views.OTPService.generate_otp")
     def test_empty_phone_number_returns_400(self, mock_generate_otp):
@@ -62,7 +57,6 @@ class RegisterOrLoginViewTests(APITestCase):
 
 
 class OTPVerifyViewTests(APITestCase):
-
     def setUp(self):
         self.url = reverse("verify-otp")
 
@@ -89,7 +83,7 @@ class OTPVerifyViewTests(APITestCase):
     @patch("accounts.views.OTPService.delete_otp")
     @patch("accounts.views.OTPService.verify_otp")
     def test_access_token_is_valid_for_correct_user(
-            self, mock_verify_otp, mock_delete_otp
+        self, mock_verify_otp, mock_delete_otp
     ):
         mock_verify_otp.return_value = (True, None)
 
@@ -117,9 +111,7 @@ class OTPVerifyViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(response.data["is_new_user"])
         self.assertEqual(response.data["message"], "logged in successfully")
-        self.assertEqual(
-            User.objects.filter(phone_number="09121234567").count(), 1
-        )
+        self.assertEqual(User.objects.filter(phone_number="09121234567").count(), 1)
 
     @patch("accounts.views.OTPService.delete_otp")
     @patch("accounts.views.OTPService.verify_otp")
@@ -134,9 +126,7 @@ class OTPVerifyViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)
-        self.assertFalse(
-            User.objects.filter(phone_number="09121234567").exists()
-        )
+        self.assertFalse(User.objects.filter(phone_number="09121234567").exists())
         mock_delete_otp.assert_not_called()
 
     @patch("accounts.views.OTPService.verify_otp")
@@ -178,13 +168,4 @@ class OTPVerifyViewTests(APITestCase):
 
         user = User.objects.get(phone_number="09121234567")
 
-        self.client.credentials(
-            HTTP_AUTHORIZATION=f"Bearer {response.data['access']}"
-        )
-
-
-
-
-
-
-
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.data['access']}")
