@@ -6,7 +6,7 @@ from .views import (
     AppointmentUpdateView,
     AvailableSlotsView,
     PaymentCallbackView,
-    PaymentStartView,
+    PaymentStartView, CancelAppointmentView,
 )
 
 urlpatterns = [
@@ -26,6 +26,7 @@ urlpatterns = [
         AppointmentUpdateView.as_view(),
         name="update_appointment_status",
     ),
+    path("appointment/cancel/<int:appointment_id>/", CancelAppointmentView.as_view(), name="cancel_appointment"),
     path("payment/start/", PaymentStartView.as_view(), name="payment_start"),
     path("payment/callback/", PaymentCallbackView.as_view(), name="payment_callback"),
 ]

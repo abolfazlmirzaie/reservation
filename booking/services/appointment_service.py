@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.utils import timezone
 
@@ -120,3 +120,15 @@ class AppointmentService:
 
         appointment.status = status
         appointment.save(update_fields=["status"])
+
+
+    @staticmethod
+    def cancel_appointment(*, appointment_id):
+
+        try :
+            appointment = Appointment.objects.get(id=appointment_id)
+            appointment.status = "cancelled_by_customer"
+            appointment.save(update_fields=["status"])
+
+        except Appointment.DoesNotExist:
+            raise AppointmentNotFoundError("نوبت موردنظر پیدا نشد")

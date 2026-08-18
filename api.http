@@ -64,19 +64,28 @@ Content-Type: application/json
 }
 ###
 
+
+# request otp for login or register
 POST 127.0.0.1:8000/api/auth/request-otp/
 Content-Type: application/json
 
 {
-  "phone_number": "11111111111"
+  "phone_number": "0913111111"
 }
 
 ###
 
+
+# verify otp
 POST 127.0.0.1:8000/api/auth/verify-otp/
 Content-Type: application/json
 
 {
-    "phone_number": "11111111111",
-    "code": "878027"
+    "phone_number": "0913111111",
+   "code": "878027"
 }
+###
+# cancel a appointment by customer
+
+POST 127.0.0.1:8000/appointment/cancel/1/
+Authorization:

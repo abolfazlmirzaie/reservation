@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.permissions import IsStylistOrSalonOwner, IsCustomer
+from accounts.permissions import IsStylistOrSalonOwner, IsCustomer, CanManageAppointments
 from salon.models import StylistService
 
 from .exceptions import (
@@ -74,7 +74,6 @@ class AppointmentCreateView(APIView):
         target_date = serializer.validated_data["date"]
         target_time = serializer.validated_data["time"]
         customer_name = serializer.validated_data["customer_name"]
-        customer_number = serializer.validated_data["customer_number"]
 
         try:
             appointment = AppointmentService.create(
@@ -82,7 +81,7 @@ class AppointmentCreateView(APIView):
                 target_date=target_date,
                 target_time=target_time,
                 customer_name=customer_name,
-                customer_phone=customer_number,
+                customer_phone=request.user.phone_number,
             )
         except SlotUnavailableError as e:
             return Response(
@@ -218,4 +217,28 @@ class AppointmentUpdateView(APIView):
         return Response(
             {"message": "وضعیت نوبت با موفقیت بروزرسانی شد."},
             status=status.HTTP_200_OK,
+        )
+
+
+class CancelAppointmentView(APIView):
+    permission_classes = [CanManageAppointments]
+
+    def post(self, request, appointment_id, *args, **kwargs):
+
+        try:
+            AppointmentService.cancel_appointment(
+                appointment_id=appointment_id,
+            )
+        except AppointmentNotFoundError as e:
+            return Response({
+                "error": str(e)
+            },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+
+        return Response(
+            {"message": "نوبت شما لغو شد بیعانه تا حداکثر 72 ساعت به حساب شما باز میگردد."},
+            status=status.HTTP_200_OK,
+
         )
