@@ -121,11 +121,10 @@ class AppointmentService:
         appointment.status = status
         appointment.save(update_fields=["status"])
 
-
     @staticmethod
     def cancel_appointment(*, appointment_id):
 
-        try :
+        try:
             appointment = Appointment.objects.get(id=appointment_id)
             appointment.status = "cancelled_by_customer"
             appointment.save(update_fields=["status"])

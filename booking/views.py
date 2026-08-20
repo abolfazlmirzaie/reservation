@@ -3,7 +3,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.permissions import IsStylistOrSalonOwner, IsCustomer, CanManageAppointments
+from accounts.permissions import (
+    IsStylistOrSalonOwner,
+    IsCustomer,
+    CanManageAppointments,
+)
 from salon.models import StylistService
 
 from .exceptions import (
@@ -230,15 +234,14 @@ class CancelAppointmentView(APIView):
                 appointment_id=appointment_id,
             )
         except AppointmentNotFoundError as e:
-            return Response({
-                "error": str(e)
-            },
+            return Response(
+                {"error": str(e)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-
         return Response(
-            {"message": "نوبت شما لغو شد بیعانه تا حداکثر 72 ساعت به حساب شما باز میگردد."},
+            {
+                "message": "نوبت شما لغو شد بیعانه تا حداکثر 72 ساعت به حساب شما باز میگردد."
+            },
             status=status.HTTP_200_OK,
-
         )
