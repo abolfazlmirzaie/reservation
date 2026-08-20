@@ -36,17 +36,15 @@ class IsCustomer(BasePermission):
         return request.user.is_authenticated and request.user.role == User.Role.CUSTOMER
 
 
-
-
-
 class CanManageAppointments(BasePermission):
     def has_permission(self, request, view):
-        if not request.user.is_authenticated or not request.user.role == User.Role.CUSTOMER:
+        if (
+            not request.user.is_authenticated
+            or not request.user.role == User.Role.CUSTOMER
+        ):
             return False
-        appointment = get_object_or_404(Appointment, id=view.kwargs['appointment_id'])
+        appointment = get_object_or_404(Appointment, id=view.kwargs["appointment_id"])
 
         if appointment.customer_phone == request.user.phone_number:
             return True
         return False
-
-
