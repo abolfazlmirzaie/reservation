@@ -5,16 +5,16 @@ GET 127.0.0.1:8000/slots/?stylist_service=2&date=2026-08-10
 
 ###
 # create an appointment
-POST 127.0.0.1:8000/appointment/
+POST 127.0.0.1:8000/appointment/create/
 Content-Type: application/json
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MTE5ODY5LCJpYXQiOjE3ODgxMTk1NjksImp0aSI6ImIwODdjYjU2YmJhNjQwMzA4Y2FjN2I2MmQ1MzExZjhkIiwidXNlcl9pZCI6IjEifQ.mwtF1ogo3YI1tIlnLuzKzk5JKT85ltcIvqvLFR56ze4
 
 {
-  "stylist_service": 2,
+  "stylist_service": 3,
   "customer_name": "ابوالفضل ",
   "customer_number": "09123456789",
-  "date": "2026-08-10",
-  "time": "8:00"
+  "date": "2026-09-1",
+  "time": "9:30"
 }
 
 ###
@@ -37,7 +37,7 @@ GET 127.0.0.1:8000/stylist/pari/appointments/?date=2026-08-10
 
 ###
 # get an special appointment by id
-GET 127.0.0.1:8000/appointment/14/
+GET 127.0.0.1:8000/appointment/4/
 
 ###
 
@@ -70,7 +70,7 @@ POST 127.0.0.1:8000/api/auth/request-otp/
 Content-Type: application/json
 
 {
-  "phone_number": "0913111111"
+  "phone_number": "09131111112"
 }
 
 ###
@@ -89,3 +89,16 @@ Content-Type: application/json
 
 POST 127.0.0.1:8000/appointment/cancel/1/
 Authorization:
+
+
+
+###
+
+POST 127.0.0.1:8000/api/token/
+Content-Type: application/json
+
+{
+  "username": "111",
+  "password": "111"
+
+}

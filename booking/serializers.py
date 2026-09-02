@@ -17,7 +17,6 @@ class AppointmentCreateSerializer(serializers.Serializer):
     date = serializers.DateField()
     time = serializers.TimeField()
     customer_name = serializers.CharField(max_length=100)
-    customer_number = serializers.CharField(max_length=11)
 
 
 class PaymentStartSerializer(serializers.Serializer):

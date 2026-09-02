@@ -1,6 +1,6 @@
 import random
 from datetime import timedelta
-
+import hashlib
 from django.utils import timezone
 
 from accounts.models import OTPGenerator
@@ -10,15 +10,16 @@ class OTPService:
     @staticmethod
     def generate_otp(phone_number):
         code = str(random.randint(10000, 99999))
+        hash_code = hashlib.sha256(str(code).encode('utf-8')).hexdigest()
         expires_at = timezone.now() + timedelta(minutes=10)
         OTPGenerator.objects.update_or_create(
             phone_number=phone_number,
             defaults={
                 "expires_at": expires_at,
-                "code": code,
+                "code": hash_code,
             },
         )
-        return code
+
 
     @staticmethod
     def verify_otp(phone_number, code):
@@ -30,11 +31,13 @@ class OTPService:
         if otp.expires_at < timezone.now():
             return False, "the code is expired"
 
-        if otp.code != code:
-            return False, "the code is invalid"
+        hash_code = hashlib.sha256(str(code).encode('utf-8')).hexdigest()
+
+        if hash_code != otp.code:
+            return False, "the code is wrong"
+
+        otp.delete()
 
         return True, None
 
-    @staticmethod
-    def delete_otp(phone_number):
-        otp = OTPGenerator.objects.filter(phone_number=phone_number).delete()
+

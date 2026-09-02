@@ -26,6 +26,12 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-development-key")
 
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
+KAVENEGAR_API_KEY = os.getenv("KAVENEGAR_API_KEY")
+
+CELERY_RESULT_BACKEND= os.getenv("CELERY_RESULT_BACKEND")
+CELERY_BROKER_URL= os.getenv("CELERY_BROKER_URL")
+
+
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")

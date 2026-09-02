@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -9,6 +8,10 @@ from salon.models import Stylist
 from .serializers import OTPVerifySerializer, RegisterOrLoginSerializer
 from .services.otp_service import OTPService
 from .throttles import LoginThrottle
+from .services.sms_service import SmsService
+from .exceptions import FailedSendMassageError, FailedSendOTPError
+
+
 
 User = get_user_model()
 
@@ -27,7 +30,11 @@ class RegisterOrLoginView(APIView):
 
         code = OTPService.generate_otp(phone_number)
 
-        print(f"OTP for {phone_number}: {code}")
+        try:
+            SmsService.send_otp(phone_number, code)
+        except FailedSendOTPError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
         return Response(
             {"message": "OTP sent successfully."}, status=status.HTTP_200_OK
@@ -68,7 +75,7 @@ class OTPVerifyView(APIView):
                 unlinked_stylist.save(update_fields=["user"])
                 user.save(update_fields=["role"])
 
-        OTPService.delete_otp(phone_number)
+
 
         refresh = RefreshToken.for_user(user)
 
