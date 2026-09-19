@@ -8,7 +8,13 @@ WORKDIR /app
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+    --timeout 100 --retries 10 \
+    -i https://mirror-pypi.runflare.com/simple \
+    --trusted-host mirror-pypi.runflare.com \
+    && pip install --no-cache-dir --timeout 100 --retries 10 \
+    -i https://mirror-pypi.runflare.com/simple \
+    --trusted-host mirror-pypi.runflare.com \
+    -r requirements.txt
 
 COPY . .
 

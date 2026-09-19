@@ -4,7 +4,7 @@
 echo "Running migrations"
 
 
-pyhton manage.py migrate
+python manage.py migrate
 
 echo "Starting"
 
