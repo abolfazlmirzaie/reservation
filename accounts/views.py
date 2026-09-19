@@ -5,19 +5,18 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from salon.models import Stylist
-from .serializers import OTPVerifySerializer, RegisterOrLoginSerializer
-from .services.otp_service import OTPService
-from .throttles import LoginThrottle
-from .services.sms_service import SmsService
+
 from .exceptions import FailedSendMassageError, FailedSendOTPError
-
-
+from .serializers import OTPVerifySerializer, RegisterOrLoginSerializer, ProfileSerializer
+from .services.otp_service import OTPService
+from .services.sms_service import SmsService
+from .throttles import LoginThrottle
 
 User = get_user_model()
 
 
 class RegisterOrLoginView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]  # noqa: RUF012
     throttle_classes = [LoginThrottle]
 
     def post(self, request):
@@ -87,6 +86,29 @@ class OTPVerifyView(APIView):
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
                 "is_new_user": created,
+                "phone_number": phone_number,
+                "first_name" : user.profile.first_name,
+                "last_name" : user.profile.last_name,
             },
             status=status.HTTP_200_OK,
         )
+
+
+class ProfileAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        profile = request.user.profile
+        serializer = ProfileSerializer(profile, many=False)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        user = request.user
+        profile = user.profile
+        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+
+        return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+

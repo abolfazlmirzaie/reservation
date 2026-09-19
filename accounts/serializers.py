@@ -1,5 +1,19 @@
 from rest_framework import serializers
 from .utils import normalize_phone_number
+from .models import Profile
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ("first_name", "last_name")
+
+
+
+
+
+
+
 
 
 class RegisterOrLoginSerializer(serializers.Serializer):
@@ -31,3 +45,6 @@ class OTPVerifySerializer(serializers.Serializer):
         if not value.isdigit():
             raise serializers.ValidationError("کد باید فقط شامل عدد باشد.")
         return value
+
+
+
