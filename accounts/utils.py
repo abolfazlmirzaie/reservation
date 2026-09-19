@@ -1,5 +1,4 @@
 import re
-from rest_framework import serializers
 
 PHONE_REGEX = re.compile(r"^09\d{9}$")
 
@@ -15,6 +14,6 @@ def normalize_phone_number(value: str) -> str:
         value = "0" + value[2:]
 
     if not PHONE_REGEX.fullmatch(value):
-        raise serializers.ValidationError("شماره موبایل معتبر نیست.")
+        raise ValueError("شماره موبایل باید با 09 اغاز شود")
 
     return value

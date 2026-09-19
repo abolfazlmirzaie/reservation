@@ -1,13 +1,16 @@
 from django.db import transaction
 from django.utils import timezone
+from django.utils.timezone import localtime
 
+from accounts.services.sms_service import SmsService
 from booking.exceptions import (
     PaymentExpiresError,
     PaymentNotFoundError,
     PaymentStatusError,
     PaymentVerificationError,
 )
-from booking.models import Payment
+from booking.models import Payment, Appointment, SMSLog
+from accounts.exceptions import FailedSendMassageError
 
 
 class PaymentService:
@@ -49,7 +52,7 @@ class PaymentService:
             raise PaymentVerificationError("پرداخت توسط کاربر لغو شد.")
         # TODO:
         # Verify payment with ZarinPal
-
+        #
         # payment.status = "success"
         # payment.paid_at = timezone.now()
         # payment.save(update_fields=['status',
@@ -60,5 +63,23 @@ class PaymentService:
         # appointment = payment.appointment
         # appointment.status = "confirmed"
         # appointment.save(update_fields=['status'])
+
+        text = f"نوبت شما با موفقیت پرداخت شد. ساعت مراجعه : {localtime(payment.appointment.start_time).strftime('%m/%d %H:%M')} "
+
+        try:
+            SmsService.send_sms(payment.appointment.customer_phone, text)
+
+            SMSLog.objects.create(
+                type="booking_confirmation",
+                status="sent",
+                appointment=payment.appointment,
+            )
+
+        except FailedSendMassageError:
+            SMSLog.objects.create(
+                type="booking_confirmation",
+                status="failed",
+                appointment=payment.appointment,
+            )
 
         return payment

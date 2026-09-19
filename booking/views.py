@@ -1,12 +1,16 @@
 from datetime import datetime
 
-from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from accounts.models import User, Profile
-from accounts.permissions import CanManageAppointment, CanManageStylist, IsCustomer
+from accounts.permissions import (
+    CanManageAppointments,
+    IsCustomer,
+    IsStylistOrSalonOwner,
+)
 from salon.models import StylistService
 
 from .exceptions import (
@@ -18,7 +22,6 @@ from .exceptions import (
     SlotUnavailableError,
     UnAvailableStatusError,
 )
-from .models import Appointment
 from .serializers import (
     AppointmentCreateSerializer,
     AppointmentDetailSerializer,
@@ -31,13 +34,7 @@ from .services.appointment_service import AppointmentService
 from .services.payment_service import PaymentService
 from .services.slot_service import get_available_slots
 
-from accounts.permissions import (
 
-
-    CanManageAppointments,
-    IsCustomer,
-    IsStylistOrSalonOwner,
-)
 class AvailableSlotsView(APIView):
     def get(self, request):
         serializer = AvailableSlotsSerializer(data=request.query_params)
@@ -84,7 +81,6 @@ class AppointmentCreateView(APIView):
         target_date = serializer.validated_data["date"]
         target_time = serializer.validated_data["time"]
         customer_name = serializer.validated_data["customer_name"]
-        customer_number = serializer.validated_data["customer_number"]
 
         try:
             appointment = AppointmentService.create(
@@ -92,7 +88,7 @@ class AppointmentCreateView(APIView):
                 target_date=target_date,
                 target_time=target_time,
                 customer_name=customer_name,
-                customer_phone=customer_number,
+                customer_phone=request.user.phone_number,
             )
         except SlotUnavailableError as e:
             return Response(
@@ -179,7 +175,7 @@ class PaymentCallbackView(APIView):
 
 
 class AppointmentDetailView(APIView):
-    permission_classes = [CanManageAppointment]
+    permission_classes = [IsStylistOrSalonOwner]
 
     def get(self, request, appointment_id, *args, **kwargs):
 
@@ -194,24 +190,18 @@ class AppointmentDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        self.check_object_permissions(request, appointment)
-
         serializer = AppointmentDetailSerializer(appointment)
 
         return Response(serializer.data)
 
 
 class AppointmentUpdateView(APIView):
-    permission_classes = [CanManageAppointment]
+    permission_classes = [IsStylistOrSalonOwner]
 
     def patch(self, request, appointment_id, *args, **kwargs):
 
         serializer = UpdateAppointmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        appointment = get_object_or_404(Appointment, id=appointment_id)
-
-        self.check_object_permissions(request, appointment)
 
         try:
             AppointmentService.update_appointment(
@@ -233,5 +223,28 @@ class AppointmentUpdateView(APIView):
 
         return Response(
             {"message": "وضعیت نوبت با موفقیت بروزرسانی شد."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class CancelAppointmentView(APIView):
+    permission_classes = [CanManageAppointments]
+
+    def post(self, request, appointment_id, *args, **kwargs):
+
+        try:
+            AppointmentService.cancel_appointment(
+                appointment_id=appointment_id,
+            )
+        except AppointmentNotFoundError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return Response(
+            {
+                "message": "نوبت شما لغو شد بیعانه تا حداکثر 72 ساعت به حساب شما باز میگردد."
+            },
             status=status.HTTP_200_OK,
         )

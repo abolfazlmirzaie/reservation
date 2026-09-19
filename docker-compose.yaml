@@ -14,6 +14,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
 
   db:
     image: postgres:17
@@ -30,6 +32,45 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  redis:
+    image: redis:7-alpine
+    container_name: reservation_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  celery_worker:
+    build: .
+    container_name: reservation_celery_worker
+    command: celery -A reservation worker -l info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery_beat:
+    build: .
+    container_name: reservation_celery_beat
+    command: celery -A reservation beat -l info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   frontend:
     build:
@@ -57,5 +98,6 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
   frontend_node_modules:
   frontend_next:

@@ -69,7 +69,7 @@ class AppointmentService:
         return appointment
 
     @staticmethod
-    def get_stylist_appointments(*, stylist_slug, target_date):
+    def get_stylist_appointments(*, stylist_slug, target_date, user):
 
         appointments = (
             Appointment.objects.select_related(
@@ -121,3 +121,14 @@ class AppointmentService:
 
         appointment.status = status
         appointment.save(update_fields=["status"])
+
+    @staticmethod
+    def cancel_appointment(*, appointment_id):
+
+        try:
+            appointment = Appointment.objects.get(id=appointment_id)
+            appointment.status = "cancelled_by_customer"
+            appointment.save(update_fields=["status"])
+
+        except Appointment.DoesNotExist:
+            raise AppointmentNotFoundError("نوبت موردنظر پیدا نشد")

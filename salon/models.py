@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
-
+from accounts.utils import normalize_phone_number
+from django.core.exceptions import ValidationError
 from accounts.models import User
 
 
@@ -63,6 +64,13 @@ class Stylist(models.Model):
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             self.slug = slug
+
+        try:
+            phone = normalize_phone_number(self.phone)
+            self.phone = phone
+        except ValueError as e:
+            raise ValidationError(str(e))
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -70,12 +78,11 @@ class Stylist(models.Model):
 
 
 class Service(models.Model):
-    salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name="services")
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.name} - {self.salon.name}"
+        return self.name
 
 
 class StylistService(models.Model):

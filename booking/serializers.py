@@ -32,6 +32,19 @@ class AppointmentCreateSerializer(serializers.Serializer):
             )
         return attrs
 
+
+
+class PaymentStartSerializer(serializers.Serializer):
+    appointment = serializers.IntegerField()
+
+    def validate_appointment(self, value):
+        try:
+            appointment = Appointment.objects.get(id=value)
+        except Appointment.DoesNotExist:
+            raise serializers.ValidationError("نوبت پیدا نشد.")
+        return appointment
+
+
 class PaymentCallbackSerializer(serializers.Serializer):
     Authority = serializers.CharField(max_length=100)
     Status = serializers.CharField(max_length=20)
