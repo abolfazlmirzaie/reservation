@@ -16,20 +16,21 @@ class AppointmentCreateSerializer(serializers.Serializer):
     )
     date = serializers.DateField()
     time = serializers.TimeField()
-    customer_name = serializers.CharField(max_length=100)
-    customer_number = serializers.CharField(max_length=11)
+    customer_name = serializers.CharField(max_length=100, required=False, allow_blank=True)
 
 
-class PaymentStartSerializer(serializers.Serializer):
-    appointment = serializers.IntegerField()
-
-    def validate_appointment(self, value):
-        try:
-            appointment = Appointment.objects.get(id=value)
-        except Appointment.DoesNotExist:
-            raise serializers.ValidationError("نوبت پیدا نشد.")
-        return appointment
-
+    def validate(self, attrs):
+        user = self.context['request'].user
+        full_name = getattr(user.profile, "full_name", None)
+        if full_name:
+            attrs["customer_name"] = full_name
+        elif not attrs["customer_name"]:
+            raise serializers.ValidationError(
+                {
+                    "customer_name": "لطفاً نام و نام خانوادگی را وارد کنید."
+                }
+            )
+        return attrs
 
 class PaymentCallbackSerializer(serializers.Serializer):
     Authority = serializers.CharField(max_length=100)

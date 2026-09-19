@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from accounts.models import User, Profile
 from accounts.permissions import CanManageAppointment, CanManageStylist, IsCustomer
 from salon.models import StylistService
 
@@ -31,7 +31,13 @@ from .services.appointment_service import AppointmentService
 from .services.payment_service import PaymentService
 from .services.slot_service import get_available_slots
 
+from accounts.permissions import (
 
+
+    CanManageAppointments,
+    IsCustomer,
+    IsStylistOrSalonOwner,
+)
 class AvailableSlotsView(APIView):
     def get(self, request):
         serializer = AvailableSlotsSerializer(data=request.query_params)
