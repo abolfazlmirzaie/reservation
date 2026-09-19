@@ -16,7 +16,22 @@ class AppointmentCreateSerializer(serializers.Serializer):
     )
     date = serializers.DateField()
     time = serializers.TimeField()
-    customer_name = serializers.CharField(max_length=100)
+    customer_name = serializers.CharField(max_length=100, required=False, allow_blank=True)
+
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        full_name = getattr(user.profile, "full_name", None)
+        if full_name:
+            attrs["customer_name"] = full_name
+        elif not attrs["customer_name"]:
+            raise serializers.ValidationError(
+                {
+                    "customer_name": "لطفاً نام و نام خانوادگی را وارد کنید."
+                }
+            )
+        return attrs
+
 
 
 class PaymentStartSerializer(serializers.Serializer):
