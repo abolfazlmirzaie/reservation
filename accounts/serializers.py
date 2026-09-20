@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from .utils import normalize_phone_number
 from .models import Profile
@@ -10,12 +11,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 
-
-
-
-
-
-
 class RegisterOrLoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True, max_length=20)
 
@@ -23,7 +18,7 @@ class RegisterOrLoginSerializer(serializers.Serializer):
 
         try:
             normalized = normalize_phone_number(value)
-        except ValueError as e:
+        except ValidationError as e:
             raise serializers.ValidationError(str(e))
 
         return normalized
@@ -36,7 +31,7 @@ class OTPVerifySerializer(serializers.Serializer):
     def validate_phone_number(self, value):
         try:
             normalized = normalize_phone_number(value)
-        except ValueError as e:
+        except ValidationError as e:
             raise serializers.ValidationError(str(e))
         return normalized
 

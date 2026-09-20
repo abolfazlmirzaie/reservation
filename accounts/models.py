@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+from .utils import normalize_phone_number
+
 
 class User(AbstractUser):
     phone_number = models.CharField(max_length=11, unique=True, blank=True, null=True)
@@ -21,6 +23,12 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.phone_number or f"User {self.pk}"
+    
+    
+    def save(self, *args, **kwargs):
+        phone_number = normalize_phone_number(self.phone_number)
+        self.phone_number = phone_number
+        super().save(*args, **kwargs)
 
 
 class OTPGenerator(models.Model):
