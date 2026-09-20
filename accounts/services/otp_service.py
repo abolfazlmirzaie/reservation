@@ -20,6 +20,8 @@ class OTPService:
                 "code": hash_code,
             },
         )
+        # print code in log for test
+        return code
 
 
     @staticmethod

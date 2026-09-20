@@ -29,10 +29,15 @@ class RegisterOrLoginView(APIView):
 
         code = OTPService.generate_otp(phone_number)
 
-        try:
-            SmsService.send_otp(phone_number, code)
-        except FailedSendOTPError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        # try:
+        #     SmsService.send_otp(phone_number, code)
+        # except FailedSendOTPError as e:
+        #     return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # print code in logs for test
+        print(code)
+
 
 
         return Response(
