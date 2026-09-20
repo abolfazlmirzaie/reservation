@@ -1,3 +1,4 @@
+import hmac
 import random
 from datetime import timedelta
 import hashlib
@@ -11,7 +12,7 @@ class OTPService:
     def generate_otp(phone_number):
         code = str(random.randint(10000, 99999))
         hash_code = hashlib.sha256(str(code).encode('utf-8')).hexdigest()
-        expires_at = timezone.now() + timedelta(minutes=10)
+        expires_at = timezone.now() + timedelta(minutes=5)
         OTPGenerator.objects.update_or_create(
             phone_number=phone_number,
             defaults={
@@ -33,7 +34,7 @@ class OTPService:
 
         hash_code = hashlib.sha256(str(code).encode('utf-8')).hexdigest()
 
-        if hash_code != otp.code:
+        if not hmac.compare_digest(otp.code, hash_code):
             return False, "the code is wrong"
 
         otp.delete()
