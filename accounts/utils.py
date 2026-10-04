@@ -6,6 +6,10 @@ PHONE_REGEX = re.compile(r"^09\d{9}$")
 
 
 def normalize_phone_number(value: str) -> str:
+
+    if value is None:
+        return None
+
     value = value.strip().replace(" ", "").replace("-", "")
 
     if value.startswith("+98"):
