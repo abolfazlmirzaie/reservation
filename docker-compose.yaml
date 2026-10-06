@@ -32,6 +32,30 @@ services:
       timeout: 5s
       retries: 5
 
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: reservation_rabbitmq
+    restart: unless-stopped
+
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: rabbitpassword
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:7-alpine
     container_name: reservation_redis
@@ -55,7 +79,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
+      rabbitmq:
         condition: service_healthy
 
   celery_beat:
@@ -69,9 +93,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
+      rabbitmq:
         condition: service_healthy
+
+
+
+
 
 volumes:
   postgres_data:
   redis_data:
+  rabbitmq_data:
