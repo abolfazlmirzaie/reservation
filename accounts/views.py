@@ -7,7 +7,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from salon.models import Stylist
 
 from .exceptions import FailedSendMassageError, FailedSendOTPError
-from .serializers import OTPVerifySerializer, RegisterOrLoginSerializer, ProfileSerializer
+from .serializers import (
+    OTPVerifySerializer,
+    RegisterOrLoginSerializer,
+    ProfileSerializer,
+)
 from .services.otp_service import OTPService
 from .services.sms_service import SmsService
 from .throttles import LoginThrottle
@@ -34,11 +38,8 @@ class RegisterOrLoginView(APIView):
         # except FailedSendOTPError as e:
         #     return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
         # print code in logs for test
         print(code)
-
-
 
         return Response(
             {"message": "OTP sent successfully."}, status=status.HTTP_200_OK
@@ -79,8 +80,6 @@ class OTPVerifyView(APIView):
                 unlinked_stylist.save(update_fields=["user"])
                 user.save(update_fields=["role"])
 
-
-
         refresh = RefreshToken.for_user(user)
 
         return Response(
@@ -92,8 +91,8 @@ class OTPVerifyView(APIView):
                 "refresh": str(refresh),
                 "is_new_user": created,
                 "phone_number": phone_number,
-                "first_name" : user.profile.first_name,
-                "last_name" : user.profile.last_name,
+                "first_name": user.profile.first_name,
+                "last_name": user.profile.last_name,
             },
             status=status.HTTP_200_OK,
         )
@@ -114,6 +113,6 @@ class ProfileAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-
-        return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
-
+        return Response(
+            {"message": "Profile updated successfully"}, status=status.HTTP_200_OK
+        )

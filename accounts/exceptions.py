@@ -1,6 +1,3 @@
-
-
-
 class FailedSendOTPError(Exception):
     pass
 

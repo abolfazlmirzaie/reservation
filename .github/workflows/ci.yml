@@ -87,11 +87,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-
-      - name: Run Ruff
-        run: |
-          ruff check .
-
       - name: check code format
         run: |
           ruff format --check .

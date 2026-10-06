@@ -62,7 +62,8 @@ class OTPVerifyViewTests(APITestCase):
 
     @patch("accounts.views.OTPService.verify_otp")
     def test_valid_code_creates_new_user_and_returns_tokens(
-        self, mock_verify_otp,
+        self,
+        mock_verify_otp,
     ):
         mock_verify_otp.return_value = (True, None)
 
@@ -80,7 +81,8 @@ class OTPVerifyViewTests(APITestCase):
 
     @patch("accounts.views.OTPService.verify_otp")
     def test_access_token_is_valid_for_correct_user(
-        self, mock_verify_otp,
+        self,
+        mock_verify_otp,
     ):
         mock_verify_otp.return_value = (True, None)
 
@@ -94,9 +96,7 @@ class OTPVerifyViewTests(APITestCase):
         self.assertEqual(token["user_id"], str(user.id))
 
     @patch("accounts.views.OTPService.verify_otp")
-    def test_valid_code_for_existing_user_logs_in(
-        self, mock_verify_otp
-    ):
+    def test_valid_code_for_existing_user_logs_in(self, mock_verify_otp):
         User.objects.create(phone_number="09121234567", role=User.Role.CUSTOMER)
         mock_verify_otp.return_value = (True, None)
 
@@ -110,9 +110,7 @@ class OTPVerifyViewTests(APITestCase):
         self.assertEqual(User.objects.filter(phone_number="09121234567").count(), 1)
 
     @patch("accounts.views.OTPService.verify_otp")
-    def test_invalid_code_returns_400_and_does_not_create_user(
-        self, mock_verify_otp
-    ):
+    def test_invalid_code_returns_400_and_does_not_create_user(self, mock_verify_otp):
         mock_verify_otp.return_value = (False, "کد نامعتبر یا منقضی شده است.")
 
         response = self.client.post(
@@ -139,7 +137,8 @@ class OTPVerifyViewTests(APITestCase):
 
     @patch("accounts.views.OTPService.verify_otp")
     def test_new_user_gets_customer_role_by_default(
-        self, mock_verify_otp,
+        self,
+        mock_verify_otp,
     ):
         mock_verify_otp.return_value = (True, None)
 
@@ -149,9 +148,7 @@ class OTPVerifyViewTests(APITestCase):
         self.assertEqual(user.role, User.Role.CUSTOMER)
 
     @patch("accounts.views.OTPService.verify_otp")
-    def test_response_tokens_are_valid_jwt_for_correct_user(
-        self, mock_verify_otp
-    ):
+    def test_response_tokens_are_valid_jwt_for_correct_user(self, mock_verify_otp):
         mock_verify_otp.return_value = (True, None)
 
         response = self.client.post(

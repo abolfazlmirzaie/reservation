@@ -10,7 +10,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ("first_name", "last_name")
 
 
-
 class RegisterOrLoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True, max_length=20)
 
@@ -40,6 +39,3 @@ class OTPVerifySerializer(serializers.Serializer):
         if not value.isdigit():
             raise serializers.ValidationError("کد باید فقط شامل عدد باشد.")
         return value
-
-
-

@@ -29,8 +29,8 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 SMS_BACKEND = os.environ.get("SMS_BACKEND", "fake")
 MELIPAYAMAK_OTP_TOKEN = os.environ.get("MELIPAYAMAK_OTP_TOKEN")
 
-CELERY_RESULT_BACKEND= os.getenv("CELERY_RESULT_BACKEND")
-CELERY_BROKER_URL= os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 CELERY_CONTROL_QUEUE_EXCLUSIVE = True
 
 ALLOWED_HOSTS = [
@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "silk",
     "rest_framework_simplejwt.token_blacklist",
-    "corsheaders"
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
