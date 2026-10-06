@@ -13,7 +13,9 @@ on:
       - master
       - recovery-branch
 
+
 jobs:
+
   test:
 
     runs-on: ubuntu-latest
@@ -22,6 +24,7 @@ jobs:
 
       postgres:
         image: postgres:17
+
         env:
           POSTGRES_DB: reservation_test
           POSTGRES_USER: postgres
@@ -85,6 +88,16 @@ jobs:
           pip install -r requirements.txt
 
 
+      - name: Run Ruff
+        run: |
+          ruff check .
+
+      - name: check code format
+        run: |
+          ruff format --check .
+          
+
+
       - name: Run migrations
         env:
           SECRET_KEY: django-insecure-ci-secret-key
@@ -121,3 +134,20 @@ jobs:
 
         run: |
           python manage.py test
+
+
+  docker:
+
+    runs-on: ubuntu-latest
+
+    needs: test
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Build Docker image
+        run: |
+          docker build -t reservation:ci .
