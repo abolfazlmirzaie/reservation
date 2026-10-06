@@ -5,11 +5,13 @@ on:
     branches:
       - main
       - master
+      - recovery-branch
 
   pull_request:
     branches:
       - main
       - master
+      - recovery-branch
 
 jobs:
   test:
