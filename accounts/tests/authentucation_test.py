@@ -158,3 +158,5 @@ class OTPVerifyViewTests(APITestCase):
         user = User.objects.get(phone_number="09121234567")
 
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.data['access']}")
+
+
