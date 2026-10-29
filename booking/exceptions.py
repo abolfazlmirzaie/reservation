@@ -28,3 +28,9 @@ class AppointmentNotFoundError(Exception):
 
 class UnAvailableStatusError(Exception):
     pass
+
+class NameRequiredError(Exception):
+    pass
+
+class UnCancellableAppointmentError(Exception):
+    pass
