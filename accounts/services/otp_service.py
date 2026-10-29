@@ -2,6 +2,8 @@ import hmac
 import random
 from datetime import timedelta
 import hashlib
+
+from django.db import transaction
 from django.utils import timezone
 
 from accounts.models import OTPGenerator
@@ -25,19 +27,21 @@ class OTPService:
 
     @staticmethod
     def verify_otp(phone_number, code):
-        try:
-            otp = OTPGenerator.objects.get(phone_number=phone_number)
-        except OTPGenerator.DoesNotExist:
-            return False, "there is no code for this number"
+        with transaction.atomic():
+            try:
+                otp = OTPGenerator.objects.select_for_update().get(phone_number=phone_number)
 
-        if otp.expires_at < timezone.now():
-            return False, "the code is expired"
+            except OTPGenerator.DoesNotExist:
+                return False, "there is no code for this number"
 
-        hash_code = hashlib.sha256(str(code).encode("utf-8")).hexdigest()
+            if otp.expires_at < timezone.now():
+                return False, "the code is expired"
 
-        if not hmac.compare_digest(otp.code, hash_code):
-            return False, "the code is wrong"
+            hash_code = hashlib.sha256(str(code).encode("utf-8")).hexdigest()
 
-        otp.delete()
+            if not hmac.compare_digest(hash_code, otp.code):
+                return False, "the code is wrong"
+
+            otp.delete()
 
         return True, None
