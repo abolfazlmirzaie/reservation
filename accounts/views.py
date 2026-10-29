@@ -42,7 +42,10 @@ class RegisterOrLoginView(APIView):
         print(code)
 
         return Response(
-            {"message": "OTP sent successfully."}, status=status.HTTP_200_OK
+            {
+                "message": "کد تایید پیامک شد.",
+                "ttl_seconds": 120,
+            }, status=status.HTTP_200_OK
         )
 
 
@@ -93,6 +96,7 @@ class OTPVerifyView(APIView):
                 "phone_number": phone_number,
                 "first_name": user.profile.first_name,
                 "last_name": user.profile.last_name,
+                "avatar": user.profile.avatar or None
             },
             status=status.HTTP_200_OK,
         )
