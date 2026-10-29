@@ -1,6 +1,7 @@
 from django.db.models import Prefetch
 from django.utils import timezone
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -22,7 +23,7 @@ from .serializers import (
 )
 from .services.day_off_service import DayOffService
 
-from .paginations import SalonPageNumberPagination
+from .paginations import DefaultPageNumberPagination
 
 
 class StylistView(RetrieveAPIView):
@@ -102,11 +103,24 @@ class SetDayOffView(APIView):
 
 
 class SalonListView(ListAPIView):
-    pagination_class = SalonPageNumberPagination
+    pagination_class = DefaultPageNumberPagination
     permission_classes = [AllowAny]
 
     serializer_class = SalonSerializer
     queryset = Salon.objects.all()
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category = self.request.query_params.get("category")
+
+        if category is None:
+            return queryset
+
+        if category not in ["mens_salon", "womens_salon"]:
+            raise ValidationError(
+                "use valid category [mens_salon, womens_salon]"
+            )
+        return queryset.filter(category=category)
 
 
 class SalonDetailView(RetrieveAPIView):
