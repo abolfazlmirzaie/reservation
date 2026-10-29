@@ -1,5 +1,5 @@
 # get available slots
-GET 127.0.0.1:8000/slots/?stylist_service=2&date=2026-08-10
+GET 127.0.0.1:8000/slots/?stylist_service=2&date=2026-11-02
 
 
 
@@ -7,23 +7,22 @@ GET 127.0.0.1:8000/slots/?stylist_service=2&date=2026-08-10
 # create an appointment
 POST 127.0.0.1:8000/appointment/create/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MTE5ODY5LCJpYXQiOjE3ODgxMTk1NjksImp0aSI6ImIwODdjYjU2YmJhNjQwMzA4Y2FjN2I2MmQ1MzExZjhkIiwidXNlcl9pZCI6IjEifQ.mwtF1ogo3YI1tIlnLuzKzk5JKT85ltcIvqvLFR56ze4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMjk2NDg3LCJpYXQiOjE3OTMyOTI4ODcsImp0aSI6IjIwMTlmYTk4MTE3ZjQzNTY5OWQ0MTk0NzJjYzU5NmIyIiwidXNlcl9pZCI6IjYifQ.Qy01aQEHB0fTISQJfa7AevHgSuJCBCraO9h_Cf0Mos8
 
 {
-  "stylist_service": 3,
-  "customer_name": "ابوالفضل ",
-  "customer_number": "09123456789",
-  "date": "2026-09-1",
+  "stylist_service": 2,
+  "date": "2026-10-31",
   "time": "9:30"
 }
 
 ###
 # statrt paying a appointment by send its id and get the payment url
 POST 127.0.0.1:8000/payment/start/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMzAxMzA3LCJpYXQiOjE3OTMyOTc3MDcsImp0aSI6IjI2MjhlYjgzMDkwZDQ5MmI4NTQ5N2ZkOTFlYjkxNmFlIiwidXNlcl9pZCI6IjYifQ.WwkCSl2tqUgkF6Tep1lzpF5El5SGQO-0SuTIOYFjyRo
 Content-Type: application/json
 
 {
-  "appointment": 14
+  "appointment": 9
 }
 
 
@@ -43,11 +42,12 @@ GET 127.0.0.1:8000/appointment/4/
 
 # update an appointment status by id
 
-PATCH 127.0.0.1:8000/appointment/8/status/
+PATCH 127.0.0.1:8000/appointment/10/status/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMzAwNjc4LCJpYXQiOjE3OTMyOTcwNzgsImp0aSI6IjRhMGE2MDk4MTI0ZTQxNDdhNzhlNGYwZDllYmYwYTNmIiwidXNlcl9pZCI6IjYifQ.niIApz7yCmlehQqcXKMEh0sXUoWEdcypgPnOZK9QA5g
 Content-Type: application/json
 
 {
-  "status": "no_shw"
+  "status": "no_show"
 }
 
 
@@ -55,11 +55,12 @@ Content-Type: application/json
 ###
 # set day off for stylist
 
-POST 127.0.0.1:8000/stylist/pari/day-off/
+POST 127.0.0.1:8000/stylist/abolfazl/day-off/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMjk2NDg3LCJpYXQiOjE3OTMyOTI4ODcsImp0aSI6IjIwMTlmYTk4MTE3ZjQzNTY5OWQ0MTk0NzJjYzU5NmIyIiwidXNlcl9pZCI6IjYifQ.Qy01aQEHB0fTISQJfa7AevHgSuJCBCraO9h_Cf0Mos8
 Content-Type: application/json
 
 {
-  "date": "2026-08-10",
+  "date": "2026-11-05",
   "reason": "مسافرت"
 }
 ###
@@ -70,7 +71,7 @@ POST 127.0.0.1:8000/api/auth/request-otp/
 Content-Type: application/json
 
 {
-  "phone_number": "09131111112"
+  "phone_number": "09131983517"
 }
 
 ###
@@ -81,24 +82,79 @@ POST 127.0.0.1:8000/api/auth/verify-otp/
 Content-Type: application/json
 
 {
-    "phone_number": "0913111111",
-   "code": "878027"
+    "phone_number": "09131983517",
+   "code": "72243"
 }
 ###
 # cancel a appointment by customer
 
-POST 127.0.0.1:8000/appointment/cancel/1/
-Authorization:
+POST 127.0.0.1:8000/appointment/9/cancel/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMzAxMzA3LCJpYXQiOjE3OTMyOTc3MDcsImp0aSI6IjI2MjhlYjgzMDkwZDQ5MmI4NTQ5N2ZkOTFlYjkxNmFlIiwidXNlcl9pZCI6IjYifQ.WwkCSl2tqUgkF6Tep1lzpF5El5SGQO-0SuTIOYFjyRo
 
 
 
 ###
 
-POST 127.0.0.1:8000/api/token/
+POST 127.0.0.1:8000/api/token/refresh/
 Content-Type: application/json
 
 {
-  "username": "111",
-  "password": "111"
-
+"refresh" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5NTg4NDg4NywiaWF0IjoxNzkzMjkyODg3LCJqdGkiOiI2ZGJlMDY2YmMwMWE0MDEwYTBhMWEyMmE2Y2I4MzgzZSIsInVzZXJfaWQiOiI2In0.XB8YVM55SbSWl2CWg95n2zgF9u_fm1AbQPcAPpA-PGs"
 }
+
+
+###
+
+GET 127.0.0.1:8000/api/auth/profile/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMjkzMjkyLCJpYXQiOjE3OTMyODk2OTIsImp0aSI6ImViYWJjYTEzNzRlYTRmNzVhMmIwNDUzODY4ODcyM2VjIiwidXNlcl9pZCI6IjYifQ.FhMmWoj0T6ovZMbz3obMUfPE-n-PhQu1FWQeXXN29_M
+###
+
+PATCH 127.0.0.1:8000/api/auth/profile/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMjc4Mjk2LCJpYXQiOjE3OTMyNzQ2OTYsImp0aSI6IjU5NTUyYWM2ZTdlYzQ1MWNiODJiODQ2MjNkMTNhM2RhIiwidXNlcl9pZCI6IjYifQ.X17sAFacXzyMdx2U_-CBme5FLHH_yC3P-x6QRjvp5NI
+Content-Type: application/json
+
+{
+  "first_name": "abolfazl",
+  "last_name": "mirzaei"
+}
+
+
+###
+
+DELETE 127.0.0.1:8000/api/auth/profile/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMjkzMjkyLCJpYXQiOjE3OTMyODk2OTIsImp0aSI6ImViYWJjYTEzNzRlYTRmNzVhMmIwNDUzODY4ODcyM2VjIiwidXNlcl9pZCI6IjYifQ.FhMmWoj0T6ovZMbz3obMUfPE-n-PhQu1FWQeXXN29_M
+Content-Type: application/json
+
+{
+  "first_name": null
+}
+
+
+###
+GET 127.0.0.1:8000/salon/list/
+###
+
+GET 127.0.0.1:8000/salon/beauty-salon/
+###
+
+GET 127.0.0.1:8000/stylist/abolfazl/
+
+###
+GET 127.0.0.1:8000/appointmens/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMzAwMTgxLCJpYXQiOjE3OTMyOTY1ODEsImp0aSI6ImIzYTQ0NjIwNWFhYjRiNTE5ZjdmODMwZjU0MGMwOWM3IiwidXNlcl9pZCI6IjYifQ.9ZeOa48fq6vri6YVdfIf0xan_ICxKtQNLpnuSL3cVbE###
+
+
+
+
+
+
+
+
+
+
+
+#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkzMjk2NDg3LCJpYXQiOjE3OTMyOTI4ODcsImp0aSI6IjIwMTlmYTk4MTE3ZjQzNTY5OWQ0MTk0NzJjYzU5NmIyIiwidXNlcl9pZCI6IjYifQ.Qy01aQEHB0fTISQJfa7AevHgSuJCBCraO9h_Cf0Mos8",
+#  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5NTg4NDg4NywiaWF0IjoxNzkzMjkyODg3LCJqdGkiOiI2ZGJlMDY2YmMwMWE0MDEwYTBhMWEyMmE2Y2I4MzgzZSIsInVzZXJfaWQiOiI2In0.XB8YVM55SbSWl2CWg95n2zgF9u_fm1AbQPcAPpA-PGs",
+
+
+
