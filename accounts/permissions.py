@@ -15,8 +15,7 @@ class IsStylistOrSalonOwner(BasePermission):
 
         if not request.user.is_authenticated:
             return False
-        slug = view.kwargs["slug"]
-        stylist = get_object_or_404(Stylist, slug=slug)
+        stylist = get_object_or_404(Stylist, user=request.user)
 
         view.cached_stylist = stylist
 
@@ -40,7 +39,6 @@ class CanManageAppointments(BasePermission):
     def has_permission(self, request, view):
         if (
             not request.user.is_authenticated
-            or not request.user.role == User.Role.CUSTOMER
         ):
             return False
         appointment = get_object_or_404(Appointment, id=view.kwargs["appointment_id"])
