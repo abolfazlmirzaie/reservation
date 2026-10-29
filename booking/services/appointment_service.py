@@ -8,7 +8,7 @@ from booking.exceptions import (
     AppointmentNotFoundError,
     InactiveResourceError,
     SlotUnavailableError,
-    UnAvailableStatusError,
+    UnAvailableStatusError, NameRequiredError, UnCancellableAppointmentError,
 )
 from booking.models import Appointment
 from booking.services.deposit_service import calculate_deposit
@@ -38,6 +38,12 @@ class AppointmentService:
         customer_name,
         customer_phone,
     ):
+
+        if not customer_name:
+            raise NameRequiredError(
+                "لطفا نام مشتری را وارد کنید."
+            )
+
 
         AppointmentService.validate(stylist_service)
         available_slots = get_available_slots(stylist_service, target_date)
@@ -124,11 +130,19 @@ class AppointmentService:
 
     @staticmethod
     def cancel_appointment(*, appointment_id):
+        appointment = Appointment.objects.get(id=appointment_id)
+        invalid_status = ["pending_payment", "confirmed"]
+
+        if appointment.status not in invalid_status:
+            raise UnCancellableAppointmentError(
+                "لغو کردن این نوبت ممکن نیست."
+            )
 
         try:
-            appointment = Appointment.objects.get(id=appointment_id)
+
             appointment.status = "cancelled_by_customer"
             appointment.save(update_fields=["status"])
 
         except Appointment.DoesNotExist:
             raise AppointmentNotFoundError("نوبت موردنظر پیدا نشد")
+
