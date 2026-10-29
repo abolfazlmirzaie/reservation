@@ -20,16 +20,6 @@ class AppointmentCreateSerializer(serializers.Serializer):
         max_length=100, required=False, allow_blank=True
     )
 
-    def validate(self, attrs):
-        user = self.context["request"].user
-        full_name = getattr(user.profile, "full_name", None)
-        if full_name:
-            attrs["customer_name"] = full_name
-        elif not attrs["customer_name"]:
-            raise serializers.ValidationError(
-                {"customer_name": "لطفاً نام و نام خانوادگی را وارد کنید."}
-            )
-        return attrs
 
 
 class PaymentStartSerializer(serializers.Serializer):
@@ -73,3 +63,9 @@ class UpdateAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = ["status"]
+
+class UserAppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ["stylist_service", "start_time", "end_time", "status", "deposit_amount"]
+

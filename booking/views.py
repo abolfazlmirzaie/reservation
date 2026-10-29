@@ -1,11 +1,12 @@
 from datetime import datetime
 
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import User, Profile
+from accounts.models import Profile
 from accounts.permissions import (
     CanManageAppointments,
     IsCustomer,
@@ -20,15 +21,16 @@ from .exceptions import (
     PaymentStatusError,
     PaymentVerificationError,
     SlotUnavailableError,
-    UnAvailableStatusError,
+    UnAvailableStatusError, NameRequiredError, UnCancellableAppointmentError,
 )
+from .models import Appointment
 from .serializers import (
     AppointmentCreateSerializer,
     AppointmentDetailSerializer,
     AvailableSlotsSerializer,
     PaymentCallbackSerializer,
     PaymentStartSerializer,
-    UpdateAppointmentSerializer,
+    UpdateAppointmentSerializer, UserAppointmentSerializer,
 )
 from .services.appointment_service import AppointmentService
 from .services.payment_service import PaymentService
@@ -80,7 +82,9 @@ class AppointmentCreateView(APIView):
         stylist_service = serializer.validated_data["stylist_service"]
         target_date = serializer.validated_data["date"]
         target_time = serializer.validated_data["time"]
-        customer_name = serializer.validated_data["customer_name"]
+        customer_name = (
+            request.user.profile.full_name or serializer.validated_data["customer_name"]
+        )
 
         try:
             appointment = AppointmentService.create(
@@ -96,6 +100,11 @@ class AppointmentCreateView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
+        except NameRequiredError as e:
+            return Response(
+                {"error", str(e)}, status=status.HTTP_400_BAD_REQUEST,
+            )
+
         return Response(
             {
                 "appointment_id": appointment.id,
@@ -107,6 +116,7 @@ class AppointmentCreateView(APIView):
 
 
 class PaymentStartView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
 
         serializer = PaymentStartSerializer(data=request.data)
@@ -242,9 +252,24 @@ class CancelAppointmentView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        except UnCancellableAppointmentError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
         return Response(
             {
                 "message": "نوبت شما لغو شد بیعانه تا حداکثر 72 ساعت به حساب شما باز میگردد."
             },
             status=status.HTTP_200_OK,
         )
+
+
+class UsersAppointmentsView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserAppointmentSerializer
+
+    def get_queryset(self):
+        return Appointment.objects.filter(customer_phone=self.request.user.phone_number).select_related("stylist_service")
