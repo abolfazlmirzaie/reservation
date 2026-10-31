@@ -49,7 +49,7 @@ class AppointmentService:
         start_datetime = timezone.make_aware(datetime.combine(target_date, target_time))
         end_datetime = start_datetime + timedelta(stylist_service.duration_minutes)
 
-
+        # this logic has at most one-minute delay, and it can be fixed after.
         reserved_appointment = Appointment.objects.filter(
             stylist_service__stylist=stylist_service.stylist,
             start_time__lt=end_datetime,

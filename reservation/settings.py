@@ -123,6 +123,23 @@ SIMPLE_JWT = {
 }
 
 
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "expire-pending-appointments": {
+        "task": "booking.tasks.expire_pending_appointments",
+        "schedule": crontab(minute="*"),
+    },
+}
+
+
+
+
+
+
+
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "Reservation API",
     "DESCRIPTION": "API documentation for the reservation platform",
