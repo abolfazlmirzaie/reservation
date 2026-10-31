@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
-
+from booking.constants import UNAVAILABLE_SLOTS_STATUSES, ALLOWED_STATUSES_FOR_UPDATE_APPOINTMENT, \
+    INVALID_STATUS_FOR_CANCEL_APPOINTMENT
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -39,11 +40,27 @@ class AppointmentService:
         customer_phone,
     ):
 
-        if not customer_name:
+        if not customer_name or not customer_name.strip():
             raise NameRequiredError(
                 "لطفا نام مشتری را وارد کنید."
             )
 
+
+        start_datetime = timezone.make_aware(datetime.combine(target_date, target_time))
+        end_datetime = start_datetime + timedelta(stylist_service.duration_minutes)
+
+
+        reserved_appointment = Appointment.objects.filter(
+            stylist_service__stylist=stylist_service.stylist,
+            start_time__lt=end_datetime,
+            end_time__gt=start_datetime,
+            status__in=UNAVAILABLE_SLOTS_STATUSES
+        )
+
+        if reserved_appointment:
+            raise SlotUnavailableError(
+                "این ساعت قبلا رزرو شده است. لطفاً ساعت دیگری انتخاب کنید."
+            )
 
         AppointmentService.validate(stylist_service)
         available_slots = get_available_slots(stylist_service, target_date)
@@ -114,13 +131,9 @@ class AppointmentService:
         except Appointment.DoesNotExist:
             raise AppointmentNotFoundError("نوبت موردنظر پیدا نشد")
 
-        allowed_status = [
-            "cancelled_by_stylist",
-            "completed",
-            "no_show",
-        ]
 
-        if status not in allowed_status:
+
+        if status not in ALLOWED_STATUSES_FOR_UPDATE_APPOINTMENT:
             raise UnAvailableStatusError(
                 "وضعیت وارد شده معتبر نیست لطفا از این وضعیت ها استفاده کنید: completed, cancelled_by_stylist, no_show"
             )
@@ -131,9 +144,9 @@ class AppointmentService:
     @staticmethod
     def cancel_appointment(*, appointment_id):
         appointment = Appointment.objects.get(id=appointment_id)
-        invalid_status = ["pending_payment", "confirmed"]
 
-        if appointment.status not in invalid_status:
+
+        if appointment.status not in INVALID_STATUS_FOR_CANCEL_APPOINTMENT:
             raise UnCancellableAppointmentError(
                 "لغو کردن این نوبت ممکن نیست."
             )
