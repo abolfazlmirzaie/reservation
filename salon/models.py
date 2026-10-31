@@ -79,7 +79,7 @@ class Stylist(models.Model):
 
 class Service(models.Model):
     name = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=True)
+
 
     def __str__(self):
         return self.name
@@ -94,6 +94,7 @@ class StylistService(models.Model):
     )
     price = models.PositiveIntegerField()
     duration_minutes = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         constraints = [

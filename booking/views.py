@@ -21,7 +21,7 @@ from .exceptions import (
     PaymentStatusError,
     PaymentVerificationError,
     SlotUnavailableError,
-    UnAvailableStatusError, NameRequiredError, UnCancellableAppointmentError,
+    UnAvailableStatusError, NameRequiredError, UnCancellableAppointmentError, InactiveResourceError,
 )
 from .models import Appointment
 from .serializers import (
@@ -102,7 +102,12 @@ class AppointmentCreateView(APIView):
 
         except NameRequiredError as e:
             return Response(
-                {"error", str(e)}, status=status.HTTP_400_BAD_REQUEST,
+                {"error": str(e)}, status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        except InactiveResourceError as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_400_BAD_REQUEST,
             )
 
         return Response(

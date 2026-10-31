@@ -25,7 +25,7 @@ class AppointmentService:
         if not stylist_service.stylist.is_active:
             raise InactiveResourceError("این آرایشگر در حال حاضر فعال نیست.")
 
-        if not stylist_service.service.is_active:
+        if not stylist_service.is_active:
             raise InactiveResourceError("این خدمت در حال حاضر فعال نیست.")
 
     @staticmethod
