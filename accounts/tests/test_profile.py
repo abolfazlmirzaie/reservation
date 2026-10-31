@@ -48,6 +48,15 @@ def test_get_profile_unauthenticated_client(api_client):
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+@pytest.mark.django_db
+def test_profile_create_after_register():
+    user = User.objects.create_user(
+        phone_number="09254569875",
+        password="lskdjagfoih",
+    )
+
+    assert Profile.objects.filter(user=user).exists()
+
 
 
 @pytest.mark.django_db
