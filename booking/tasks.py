@@ -6,10 +6,7 @@ from .models import Appointment
 
 @shared_task
 def expire_pending_appointments():
-
     Appointment.objects.filter(
         status="pending_payment",
         expires_at__lte=timezone.now(),
-    ).update(
-        status="expired",
-    )
+    ).update(status="expired")

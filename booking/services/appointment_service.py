@@ -32,38 +32,49 @@ class AppointmentService:
     @staticmethod
     @transaction.atomic
     def create(
-        *,
-        stylist_service,
-        target_date,
-        target_time,
-        customer_name,
-        customer_phone,
+            *,
+            stylist_service,
+            target_date,
+            target_time,
+            customer_name,
+            customer_phone,
     ):
-
         if not customer_name or not customer_name.strip():
             raise NameRequiredError(
                 "لطفا نام مشتری را وارد کنید."
             )
 
+        AppointmentService.validate(stylist_service)
 
-        start_datetime = timezone.make_aware(datetime.combine(target_date, target_time))
-        end_datetime = start_datetime + timedelta(stylist_service.duration_minutes)
+        start_datetime = timezone.make_aware(
+            datetime.combine(target_date, target_time)
+        )
 
-        # this logic has at most one-minute delay, and it can be fixed after.
+        if start_datetime <= timezone.now():
+            raise SlotUnavailableError(
+                "امکان رزرو ساعت‌های گذشته وجود ندارد."
+            )
+
+        end_datetime = start_datetime + timedelta(
+            minutes=stylist_service.duration_minutes
+        )
+
         reserved_appointment = Appointment.objects.filter(
             stylist_service__stylist=stylist_service.stylist,
             start_time__lt=end_datetime,
             end_time__gt=start_datetime,
-            status__in=UNAVAILABLE_SLOTS_STATUSES
+            status__in=UNAVAILABLE_SLOTS_STATUSES,
         )
 
-        if reserved_appointment:
+        if reserved_appointment.exists():
             raise SlotUnavailableError(
                 "این ساعت قبلا رزرو شده است. لطفاً ساعت دیگری انتخاب کنید."
             )
 
-        AppointmentService.validate(stylist_service)
-        available_slots = get_available_slots(stylist_service, target_date)
+        available_slots = get_available_slots(
+            stylist_service,
+            target_date,
+        )
 
         if target_time not in available_slots:
             raise SlotUnavailableError(
@@ -72,13 +83,7 @@ class AppointmentService:
 
         deposit_data = calculate_deposit(stylist_service)
 
-        start_datetime = timezone.make_aware(datetime.combine(target_date, target_time))
-
-        end_datetime = start_datetime + timedelta(
-            minutes=stylist_service.duration_minutes
-        )
-
-        appointment = Appointment.objects.create(
+        return Appointment.objects.create(
             stylist_service=stylist_service,
             customer_name=customer_name,
             customer_phone=customer_phone,
@@ -88,8 +93,6 @@ class AppointmentService:
             expires_at=timezone.now() + timedelta(minutes=10),
             **deposit_data,
         )
-
-        return appointment
 
     @staticmethod
     def get_stylist_appointments(*, stylist_slug, target_date, user):

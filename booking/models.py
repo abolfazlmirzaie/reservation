@@ -11,7 +11,7 @@ class Appointment(models.Model):
         ("cancelled_by_stylist", "لغو شده توسظ ارایشگر"),
         ("completed", "انجام شده"),
         ("no_show", "عدم حضور مشتری"),
-        ("EXPIRED", "منقضی شده")
+        ("expired", "منقضی شده")
     )
 
     stylist_service = models.ForeignKey(
