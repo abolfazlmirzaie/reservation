@@ -1,6 +1,25 @@
 from django.db import models
 
-from salon.models import StylistService
+from salon.models import StylistService, Stylist
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import (
+    DateTimeRangeField,
+    RangeBoundary,
+    RangeOperators,
+)
+from django.db.models import Func, Q
+
+
+class TsTzRange(Func):
+    function = "TSTZRANGE"
+    output_field = DateTimeRangeField()
+
+
+
+
+
+
+
 
 
 class Appointment(models.Model):
@@ -17,6 +36,7 @@ class Appointment(models.Model):
     stylist_service = models.ForeignKey(
         StylistService, on_delete=models.PROTECT, related_name="appointments"
     )
+    stylist = models.ForeignKey(Stylist, on_delete=models.PROTECT, related_name="appointments")
     customer_name = models.CharField(max_length=100)
     customer_phone = models.CharField(max_length=11)
     start_time = models.DateTimeField()
@@ -36,8 +56,40 @@ class Appointment(models.Model):
         verbose_name = "نوبت"
         verbose_name_plural = "نوبت ها"
 
+        constraints = [
+            ExclusionConstraint(
+                name="prevent_overlapping_appointments",
+                expressions=[
+                    (
+                        TsTzRange(
+                            "start_time",
+                            "end_time",
+                            RangeBoundary(),
+                        ),
+                        RangeOperators.OVERLAPS,
+                    ),
+                    (
+                        "stylist",
+                        RangeOperators.EQUAL,
+                    ),
+                ],
+                condition=Q(
+                    status__in=[
+                        "pending_payment",
+                        "confirmed",
+                        "cancelled_by_stylist",
+                        "completed",
+                        "no_show",
+                    ]
+                ),
+            )
+        ]
+
     def __str__(self):
         return f"{self.customer_name} - {self.stylist_service.stylist.name} - {self.start_time.strftime('%Y-%m-%d %H:%M')}"
+    def save(self, *args, **kwargs):
+        self.stylist_id = self.stylist_service.stylist_id
+        super().save(*args, **kwargs)
 
 
 class PlatformSettings(models.Model):

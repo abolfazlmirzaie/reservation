@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
 from booking.constants import UNAVAILABLE_SLOTS_STATUSES, ALLOWED_STATUSES_FOR_UPDATE_APPOINTMENT, \
     INVALID_STATUS_FOR_CANCEL_APPOINTMENT
-from django.db import transaction
-from django.shortcuts import get_object_or_404
+from django.db import transaction, IntegrityError
 from django.utils import timezone
 
 from booking.exceptions import (
@@ -14,6 +13,7 @@ from booking.exceptions import (
 from booking.models import Appointment
 from booking.services.deposit_service import calculate_deposit
 from booking.services.slot_service import get_available_slots
+from salon.models import Stylist
 
 
 class AppointmentService:
@@ -30,7 +30,6 @@ class AppointmentService:
             raise InactiveResourceError("این خدمت در حال حاضر فعال نیست.")
 
     @staticmethod
-    @transaction.atomic
     def create(
             *,
             stylist_service,
@@ -44,58 +43,82 @@ class AppointmentService:
                 "لطفا نام مشتری را وارد کنید."
             )
 
-        AppointmentService.validate(stylist_service)
+        try:
+            with transaction.atomic():
 
-        start_datetime = timezone.make_aware(
-            datetime.combine(target_date, target_time)
-        )
+                stylist = (
+                    Stylist.objects
+                    .select_for_update()
+                    .get(pk=stylist_service.stylist_id)
+                )
 
-        if start_datetime <= timezone.now():
-            raise SlotUnavailableError(
-                "امکان رزرو ساعت‌های گذشته وجود ندارد."
-            )
+                AppointmentService.validate(stylist_service)
 
-        end_datetime = start_datetime + timedelta(
-            minutes=stylist_service.duration_minutes
-        )
+                start_datetime = timezone.make_aware(
+                    datetime.combine(target_date, target_time)
+                )
 
-        reserved_appointment = Appointment.objects.filter(
-            stylist_service__stylist=stylist_service.stylist,
-            start_time__lt=end_datetime,
-            end_time__gt=start_datetime,
-            status__in=UNAVAILABLE_SLOTS_STATUSES,
-        )
+                if start_datetime <= timezone.now():
+                    raise SlotUnavailableError(
+                        "امکان رزرو ساعت‌های گذشته وجود ندارد."
+                    )
 
-        if reserved_appointment.exists():
-            raise SlotUnavailableError(
-                "این ساعت قبلا رزرو شده است. لطفاً ساعت دیگری انتخاب کنید."
-            )
+                end_datetime = start_datetime + timedelta(
+                    minutes=stylist_service.duration_minutes
+                )
 
-        available_slots = get_available_slots(
-            stylist_service,
-            target_date,
-        )
+                reserved_appointment = Appointment.objects.filter(
+                    stylist_service__stylist=stylist_service.stylist,
+                    start_time__lt=end_datetime,
+                    end_time__gt=start_datetime,
+                    status__in=UNAVAILABLE_SLOTS_STATUSES,
+                )
 
-        if target_time not in available_slots:
-            raise SlotUnavailableError(
-                "متاسفانه این ساعت قابل رزرو نیست. لطفاً ساعت دیگری انتخاب کنید."
-            )
+                if reserved_appointment.exists():
+                    raise SlotUnavailableError(
+                        "این ساعت قبلا رزرو شده است. لطفاً ساعت دیگری انتخاب کنید."
+                    )
 
-        deposit_data = calculate_deposit(stylist_service)
+                available_slots = get_available_slots(
+                    stylist_service,
+                    target_date,
+                )
 
-        return Appointment.objects.create(
-            stylist_service=stylist_service,
-            customer_name=customer_name,
-            customer_phone=customer_phone,
-            start_time=start_datetime,
-            end_time=end_datetime,
-            status="pending_payment",
-            expires_at=timezone.now() + timedelta(minutes=10),
-            **deposit_data,
-        )
+                if target_time not in available_slots:
+                    raise SlotUnavailableError(
+                        "متاسفانه این ساعت قابل رزرو نیست. لطفاً ساعت دیگری انتخاب کنید."
+                    )
+
+                deposit_data = calculate_deposit(stylist_service)
+
+                return Appointment.objects.create(
+                    stylist_service=stylist_service,
+                    customer_name=customer_name,
+                    customer_phone=customer_phone,
+                    start_time=start_datetime,
+                    end_time=end_datetime,
+                    status="pending_payment",
+                    expires_at=timezone.now() + timedelta(minutes=10),
+                    **deposit_data,
+                )
+
+        except IntegrityError as error:
+            cause = error.__cause__
+            diagnostic = getattr(cause, "diag", None)
+
+            if (
+                    diagnostic
+                    and diagnostic.constraint_name
+                    == "prevent_overlapping_appointments"
+            ):
+                raise SlotUnavailableError(
+                    "این ساعت قبلا رزرو شده است. لطفاً ساعت دیگری انتخاب کنید."
+                ) from error
+
+            raise
 
     @staticmethod
-    def get_stylist_appointments(*, stylist_slug, target_date, user):
+    def get_stylist_appointments(*, stylist_slug, target_date):
 
         appointments = (
             Appointment.objects.select_related(
