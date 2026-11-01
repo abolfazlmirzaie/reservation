@@ -34,5 +34,5 @@ urlpatterns = [
     ),
     path("payment/start/", PaymentStartView.as_view(), name="payment_start"),
     path("payment/callback/", PaymentCallbackView.as_view(), name="payment_callback"),
-    path("appointmens/", UsersAppointmentsView.as_view(), name="taken-appointments"),
+    path("appointments/", UsersAppointmentsView.as_view(), name="taken-appointments"),
 ]

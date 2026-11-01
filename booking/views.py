@@ -52,7 +52,12 @@ class AvailableSlotsView(APIView):
             )
 
         try:
-            stylist_service = StylistService.objects.get(id=stylist_service_id)
+            stylist_service = (
+                StylistService.objects.select_related(
+                    "stylist",
+                    "stylist__salon"
+                )
+            ).get(id=stylist_service_id)
         except StylistService.DoesNotExist:
             return Response(
                 {"error": "this service for this stylist does not exist"},

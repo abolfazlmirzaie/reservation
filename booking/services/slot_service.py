@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+from booking.constants import BUSY_APPOINTMENT_STATUSES
 from django.db.models import Q
 from django.utils import timezone
 
@@ -21,13 +21,9 @@ def get_django_day_of_week(python_weekday):
     return mapping[python_weekday]
 
 
-BUSY_APPOINTMENT_STATUSES = [
-    "confirmed",
-    "completed",
-]
 
 
-def get_available_slots(stylist_service, target_date, step_minutes=30):
+def get_available_slots(stylist_service, target_date):
     stylist = stylist_service.stylist
     duration = timedelta(minutes=stylist_service.duration_minutes)
 
@@ -46,7 +42,7 @@ def get_available_slots(stylist_service, target_date, step_minutes=30):
     if DayOff.objects.filter(stylist=stylist, date=target_date).exists():
         return []
 
-    step = timedelta(minutes=step_minutes)
+    step = duration
     day_start = timezone.make_aware(
         datetime.combine(target_date, working_hours.start_time)
     )
@@ -55,7 +51,8 @@ def get_available_slots(stylist_service, target_date, step_minutes=30):
     booked_appointments = (
         Appointment.objects.filter(
             stylist_service__stylist=stylist,
-            start_time__date=target_date,
+            start_time__lt=day_end,
+            end_time__gt=day_start,
         )
         .filter(
             Q(status__in=BUSY_APPOINTMENT_STATUSES)
@@ -68,12 +65,21 @@ def get_available_slots(stylist_service, target_date, step_minutes=30):
         (timezone.localtime(appt.start_time), timezone.localtime(appt.end_time))
         for appt in booked_appointments
     ]
-    boundary_points = sorted(
-        set(
-            [day_start]
-            + [timezone.localtime(appt.end_time) for appt in booked_appointments]
-        )
-    )
+    # boundary_points = sorted(
+    #     set(
+    #         [day_start]
+    #         + [timezone.localtime(appt.end_time) for appt in booked_appointments]
+    #     )
+    # )
+
+    boundary_points = sorted({
+        day_start,
+        *(
+            end
+            for _, end in booked_ranges
+            if day_start <= end < day_end
+        ),
+    })
 
     available_slots = []
     for start_point in boundary_points:

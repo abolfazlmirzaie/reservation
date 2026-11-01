@@ -21,3 +21,10 @@ INVALID_STATUS_FOR_CANCEL_APPOINTMENT = [
             "pending_payment",
             "confirmed",
         ]
+
+BUSY_APPOINTMENT_STATUSES = [
+    "confirmed",
+    "completed",
+    "cancelled_by_stylist",
+    "no_show",
+]
