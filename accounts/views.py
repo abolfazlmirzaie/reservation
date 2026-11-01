@@ -96,7 +96,11 @@ class OTPVerifyView(APIView):
                 "phone_number": phone_number,
                 "first_name": user.profile.first_name,
                 "last_name": user.profile.last_name,
-                "avatar": user.profile.avatar or None
+                "avatar": (
+                    request.build_absolute_uri(user.profile.avatar.url)
+                    if user.profile.avatar
+                    else None
+                )
             },
             status=status.HTTP_200_OK,
         )
